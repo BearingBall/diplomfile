@@ -106,3 +106,18 @@ def TrainOneImage(model, loss, image, label, epoches = 30, GradRate = 0.05, TVCo
         print("ep:", epoch, " loss:", cost)
     
     return patch
+
+def CheckPatch(patch, image, label, model, device, loss):
+    image = data.ImToTen(image)
+    clearPred = model([image])[0]
+
+    attackedImage = image
+
+    for l in label:
+            if l["category_id"] == 1:
+                wasPerson = True
+                attackedImage = am.setPatch(attackedImage, patch, l['bbox'], 0.2, device)
+
+    attackedPred = model([attackedImage])[0]
+
+    print("Clear loss:", loss(label, clearPred), "Attacked loss:", loss(label, attackedPred) )

@@ -7,7 +7,8 @@ import numpy as np
 
 
 def lossObjectness(origLabels, predictedLabels): #as in InvisibleCloak
-    score = 0
+    score = torch.tensor(0.0)
+    score.requires_grad = True
     for i in range(len(predictedLabels["labels"])):
         if predictedLabels["labels"][i] == 1:
             score =+ max(predictedLabels["scores"][i] + 1, 0)*max(predictedLabels["scores"][i] + 1, 0)
