@@ -3,13 +3,14 @@ import json
 import numpy as np
 import cv2 as cv2
 from torch.utils.data import Dataset
+import torchvision.transforms as transforms
 import torch
 
 def ImToTen(image):
     return (torch.tensor(np.swapaxes(np.swapaxes(image, 0, 2),1,2)).float() / 255)
 
 def TenToIm(tensor):
-    return tensor.permute(1, 2, 0).detach().numpy()
+    return tensor.permute(1, 2, 0).detach().numpy()*255
 
 
 class AdversarialDataset(Dataset):

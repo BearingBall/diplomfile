@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import attackMethods as am
 import pickle
 import torch
+import numpy as np
 
 '''
 This model needed to look at dataset and check correckness of dataset parsing and model working.
@@ -121,3 +122,39 @@ def CheckPatch(patch, image, label, model, device, loss):
     attackedPred = model([attackedImage])[0]
 
     print("Clear loss:", loss(label, clearPred), "Attacked loss:", loss(label, attackedPred) )
+
+def labelization(image, label, threshold):
+    for i in range(len(label["labels"])):
+        if label["scores"][i] < threshold:
+            continue
+        if label["labels"][i] == 1:
+            image = cv2.rectangle(image, (int(label['boxes'][i][0]), int(label['boxes'][i][1]) ), ( int(label['boxes'][i][0])+int(label['boxes'][i][2]),int(label['boxes'][i][1])+int(label['boxes'][i][3])), (255,0,0), 1)
+    return image
+
+def testPatch(patch, image, label, model, device, loss):
+    clearPred = model([data.ImToTen(image)])[0]
+    attackedImage = data.ImToTen(image)
+    attackedImage = attackedImage.to(device)
+    for l in label:
+        if l["category_id"] == 1:
+            attackedImage = am.setPatch(attackedImage, patch, l['bbox'], 0.2, device) 
+
+    attackedPred = model([attackedImage])[0]
+
+    threshold = 0.0
+
+    image_before = labelization(cv2.cvtColor(data.TenToIm((data.ImToTen(image))), cv2.COLOR_RGB2BGR), clearPred, threshold)
+    image_after = labelization(cv2.cvtColor(data.TenToIm(attackedImage), cv2.COLOR_RGB2BGR), attackedPred, threshold)
+
+    cv2.imshow("image", np.concatenate((image_before, image_after), axis=1)/255)
+
+    flag = True
+    while (flag):
+        key = cv2.waitKey(1)
+
+        if key & 0xFF == ord('q'):
+            flag = False
+            break
+  
+    cv2.destroyAllWindows() 
+

@@ -17,7 +17,7 @@ def lossObjectness(origLabels, predictedLabels): #as in InvisibleCloak
 def TV(patch): # TV - total variation penalthy (smooth for patch)
     K = torch.Tensor([[1, 1, 1], [1, -8, 1], [1, 1, 1]])
     K = K.view(1, 1, 3, 3).repeat(1, 3, 1, 1)
-    output = F.conv2d(torch.unsqueeze(patch, dim = 0),K, padding=1)
+    output = F.conv2d(torch.unsqueeze(patch, dim = 0),K, padding=1) # todo: change padding mode
     return output.sum()
 
 
