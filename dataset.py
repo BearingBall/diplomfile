@@ -29,6 +29,7 @@ class AdversarialDataset(Dataset):
 
     def __len__(self):
         return len(self.images)
+        #return 2000
     
     def __getitem__(self, index):    
         if (index > len(self.images)):
@@ -37,12 +38,34 @@ class AdversarialDataset(Dataset):
         image = cv2.imread(self.folderImagesName+"/"+self.images[index]["file_name"])
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-        if (self.resizeParam != None):
-            image = cv2.resize(image, self.resizeParam)
-
         indexes = [i for i in range(len(self.annotations)) if self.annotations[i]["image_id"] == self.images[index]["id"]]
 
-        return image, np.asarray(self.annotations)[indexes]
+        labels = np.asarray(self.annotations)[indexes]
+
+        tenLabels = []
+
+        labelsNumber = 0
+        labelsSize = 10
+
+        for l in labels:
+            if l["category_id"] == 1 and labelsNumber < labelsSize:
+                labelsNumber+=1
+                tenLabels.append(torch.tensor(l["bbox"]))
+
+        if (self.resizeParam != None):
+            x_ratio = self.resizeParam[0]/image.shape[1]
+            y_ratio = self.resizeParam[1]/image.shape[0]
+            for l in tenLabels:
+                l[0] = int(l[0] * x_ratio)
+                l[1] = int(l[1] * y_ratio)
+                l[2] = min(int(l[2] * x_ratio), self.resizeParam[0] - l[0])
+                l[3] = min(int(l[3] * y_ratio), self.resizeParam[1] - l[1])
+        
+            image = cv2.resize(image, self.resizeParam)
+        for i in range(labelsNumber, labelsSize):
+            tenLabels.append(torch.tensor(np.array([0.0,0.0,0.0,0.0])))
+
+        return image, tenLabels
 
 """
 {

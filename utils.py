@@ -128,23 +128,22 @@ def labelization(image, label, threshold):
         if label["scores"][i] < threshold:
             continue
         if label["labels"][i] == 1:
-            image = cv2.rectangle(image, (int(label['boxes'][i][0]), int(label['boxes'][i][1]) ), ( int(label['boxes'][i][0])+int(label['boxes'][i][2]),int(label['boxes'][i][1])+int(label['boxes'][i][3])), (255,0,0), 1)
+            image = cv2.rectangle(image, (int(label['boxes'][i][0]), int(label['boxes'][i][1]) ), ( int(label['boxes'][i][2]),int(label['boxes'][i][3])), (255,0,0), 1)
+            image = cv2.putText(image, str(float(label["scores"][i])), (int(label['boxes'][i][0]), int(label['boxes'][i][1])), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255), 2, cv2.LINE_AA, False)
     return image
 
-def testPatch(patch, image, label, model, device, loss):
-    clearPred = model([data.ImToTen(image)])[0]
+def testPatch(patch, image, label, model, device, loss, threshold = 0.0):
+    clearPred = model([data.ImToTen(image).to(device)])[0]
     attackedImage = data.ImToTen(image)
     attackedImage = attackedImage.to(device)
     for l in label:
-        if l["category_id"] == 1:
-            attackedImage = am.setPatch(attackedImage, patch, l['bbox'], 0.2, device) 
+        attackedImage = am.setPatch(attackedImage, patch, l, 0.2, device) 
 
-    attackedPred = model([attackedImage])[0]
+    with torch.no_grad():
+        attackedPred = model([attackedImage])[0]
 
-    threshold = 0.0
-
-    image_before = labelization(cv2.cvtColor(data.TenToIm((data.ImToTen(image))), cv2.COLOR_RGB2BGR), clearPred, threshold)
-    image_after = labelization(cv2.cvtColor(data.TenToIm(attackedImage), cv2.COLOR_RGB2BGR), attackedPred, threshold)
+    image_before = labelization(cv2.cvtColor(data.TenToIm((data.ImToTen(image)).cpu()), cv2.COLOR_RGB2BGR), clearPred, threshold)
+    image_after = labelization(cv2.cvtColor(data.TenToIm(attackedImage.cpu()), cv2.COLOR_RGB2BGR), attackedPred, threshold)
 
     cv2.imshow("image", np.concatenate((image_before, image_after), axis=1)/255)
 
