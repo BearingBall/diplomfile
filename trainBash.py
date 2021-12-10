@@ -33,6 +33,9 @@ def main(folderImages, folderLabels):
     model.eval()
     model = model.float().to(device)
 
+    for p in model.parameters():
+        p.requires_grad = False
+
     patch = am.generatePatch()
     patch = patch.to(device)
     patch.requires_grad = True
@@ -58,15 +61,15 @@ def main(folderImages, folderLabels):
             for im in image:
                 attackedImage.append(data.ImToTen(im).to(device))
 
-            for attackedIm in attackedImage:
-                attackedIm.requires_grad = True
+            # for attackedIm in attackedImage:
+            #     attackedIm.requires_grad = True
 
-            clearPredict = model(attackedImage)
+            with torch.no_grad():
+                clearPredict = model(attackedImage)
 
             for i in range(len(attackedImage)):
                 for l in label[i]:
                     attackedImage[i] = am.setPatch(attackedImage[i], patch, l, 0.2, device) 
-
 
             predict = model(attackedImage)
 
