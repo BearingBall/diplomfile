@@ -28,7 +28,7 @@ def main(folderImages, folderLabels):
     batch_size = 6
     train_loader  = torch.utils.data.DataLoader(dataset=dataset, batch_size=batch_size, shuffle=False)
     test_loader = torch.utils.data.DataLoader(dataset=dataset, batch_size=batch_size, shuffle=False)
-    device = torch.device("cuda:0")
+    device = torch.device("cpu")
 
     model.eval()
     model = model.float().to(device)

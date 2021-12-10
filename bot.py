@@ -3,17 +3,27 @@ import telebot
 bot = telebot.TeleBot('5042122150:AAEA76aSqQBTFaIjGnQMssIpsKkGKuhQTVg')
 owner_id = 384881851
 
-@bot.message_handler(content_types=['text'])
+@bot.message_handler(commands=['help', 'ping'])
+def get_help_messages(message):
+    if message.text == "/help":
+        bot.send_message(message.from_user.id, "Hello, world. Запуляй в меня картинку и я найду на ней всех кожаных мешков!")
+    if message.text == "/ping":
+        bot.send_message(message.from_user.id, "Я живой, не пингуй")
+
+@bot.message_handler(content_types=['alive?'])
 def get_text_messages(message):
     if message.text == "Привет":
-        bot.send_message(message.from_user.id, "Hello, world. Запуляй в меня картинку и я найду на ней всех кожаных мешков!")
+        pass
 
 @bot.message_handler(content_types=['photo'])
 def get_photo_messages(message):
     fileID = message.photo[-1].file_id
     file_info = bot.get_file(fileID)
     downloaded_file = bot.download_file(file_info.file_path)
-    bot.send_photo(owner_id, downloaded_file)
+
+    if (message.chat.id != owner_id):
+        bot.send_message(owner_id, 'пользовательская активность:' + str(message.chat.id))
+        bot.send_photo(owner_id, downloaded_file)
     #with open("botmage.jpg", 'wb') as new_file:
     #    new_file.write(downloaded_file)
     image = operateImage(downloaded_file)
@@ -22,17 +32,23 @@ def get_photo_messages(message):
     bot.send_photo(message.chat.id, image)
 
 @bot.message_handler(content_types=['document'])
-def get_photo_messages(message):
-    fileID = message.document.file_id
-    file_info = bot.get_file(fileID)
-    downloaded_file = bot.download_file(file_info.file_path)
-    bot.send_photo(owner_id, downloaded_file)
-    #with open("botmage.jpg", 'wb') as new_file:
-    #    new_file.write(downloaded_file)
-    image = operateImage(downloaded_file)
+def get_photo_doc_messages(message):
+    try:
+        fileID = message.document.file_id
+        file_info = bot.get_file(fileID)
+        downloaded_file = bot.download_file(file_info.file_path)
+
+        if (message.chat.id != owner_id):
+            bot.send_message(owner_id, 'пользовательская активность:' + str(message.chat.id))
+            bot.send_photo(owner_id, downloaded_file)
+        #with open("botmage.jpg", 'wb') as new_file:
+        #    new_file.write(downloaded_file)
+        image = operateImage(downloaded_file)
     
-    bot.send_message(message.chat.id, 'Вот твои кожаные мешки')
-    bot.send_photo(message.chat.id, image)
+        bot.send_message(message.chat.id, 'Вот твои кожаные мешки')
+        bot.send_photo(message.chat.id, image)
+    except:
+        pass
 
 
 def operateImage(image):

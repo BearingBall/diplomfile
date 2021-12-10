@@ -7,7 +7,7 @@ import torchvision.transforms as transforms
 import torch
 
 def ImToTen(image):
-    return (torch.tensor(np.swapaxes(np.swapaxes(image, 0, 2),1,2)).float() / 255)
+    return (torch.tensor(image).permute(2, 0, 1).float() / 255)
 
 def TenToIm(tensor):
     return tensor.permute(1, 2, 0).detach().numpy()*255
