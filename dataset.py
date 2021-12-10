@@ -42,15 +42,18 @@ class AdversarialDataset(Dataset):
 
         labels = np.asarray(self.annotations)[indexes]
 
-        tenLabels = []
-
         labelsNumber = 0
         labelsSize = 10
 
+        tenLabels = torch.zeros((labelsSize, 4), dtype=float)
+
         for l in labels:
             if l["category_id"] == 1 and labelsNumber < labelsSize:
+                tenLabels[labelsNumber][0] = l["bbox"][0]
+                tenLabels[labelsNumber][1] = l["bbox"][1]
+                tenLabels[labelsNumber][2] = l["bbox"][2]
+                tenLabels[labelsNumber][3] = l["bbox"][3]
                 labelsNumber+=1
-                tenLabels.append(torch.tensor(l["bbox"]))
 
         if (self.resizeParam != None):
             x_ratio = self.resizeParam[0]/image.shape[1]
@@ -62,9 +65,7 @@ class AdversarialDataset(Dataset):
                 l[3] = min(int(l[3] * y_ratio), self.resizeParam[1] - l[1])
         
             image = cv2.resize(image, self.resizeParam)
-        for i in range(labelsNumber, labelsSize):
-            tenLabels.append(torch.tensor(np.array([0.0,0.0,0.0,0.0])))
-
+            
         return image, tenLabels
 
 """
