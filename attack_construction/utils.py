@@ -34,7 +34,7 @@ def visualize_labels(image, labels, threshold):
             continue
         if labels["labels"][i] == 1:
             image = cv2.rectangle(image, (int(labels['boxes'][i][0]), int(labels['boxes'][i][1]) ), ( int(labels['boxes'][i][2]),int(labels['boxes'][i][3])), (255,0,0), 1)
-            image = cv2.putText(image, str(float(labels["scores"][i])), (int(labels['boxes'][i][0]), int(labels['boxes'][i][1])), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255), 2, cv2.LINE_AA, False)
+            image = cv2.putText(image, str(float(labels["scores"][i])), (int(labels['boxes'][i][0]), int(labels['boxes'][i][1])), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0,0,255), 2, cv2.LINE_AA, False)
     return image
 
 
@@ -43,7 +43,7 @@ def get_patch_test(patch, image, label, model, device, loss, threshold = 0.0):
     attacked_image = image.clone()
 
     for l in label:
-        attacked_image = am.setPatch(attacked_image, patch, l, 0.2, device) 
+        attacked_image = am.insert_patch(attacked_image, patch, l, 0.2, device) 
 
     with torch.no_grad():
         prediction = model([image, attacked_image])
