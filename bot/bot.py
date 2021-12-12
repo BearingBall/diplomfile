@@ -26,7 +26,7 @@ def get_photo_messages(message):
         bot.send_photo(owner_id, downloaded_file)
     #with open("botmage.jpg", 'wb') as new_file:
     #    new_file.write(downloaded_file)
-    image = operateImage(downloaded_file)
+    image = operate_image(downloaded_file)
     
     bot.send_message(message.chat.id, 'Вот твои кожаные мешки')
     bot.send_photo(message.chat.id, image)
@@ -43,7 +43,7 @@ def get_photo_doc_messages(message):
             bot.send_photo(owner_id, downloaded_file)
         #with open("botmage.jpg", 'wb') as new_file:
         #    new_file.write(downloaded_file)
-        image = operateImage(downloaded_file)
+        image = operate_image(downloaded_file)
     
         bot.send_message(message.chat.id, 'Вот твои кожаные мешки')
         bot.send_photo(message.chat.id, image)
@@ -51,52 +51,37 @@ def get_photo_doc_messages(message):
         pass
 
 
-def operateImage(image):
+def operate_image(image):
     image = np.asarray(bytearray(image), dtype="uint8")
     image = cv2.imdecode(image, cv2.IMREAD_COLOR)
 
-    #image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-
     with torch.no_grad():
-        clearPred = model([data.ImToTen(image).to(device)])[0]
+        predict = model([data.image_to_tensor(image).to(device)])[0]
 
-    labelizated_photo = utils.labelization(image, clearPred, threshold)
-    labelizated_photo = cv2.imencode('.JPEG', labelizated_photo)
-    return labelizated_photo[1].tobytes()
+    result = utils.labelization(image, predict, threshold)
+    result = cv2.imencode('.JPEG', result)
+    return result[1].tobytes()
 
 
 
-import os
-import sys
+
 import numpy as np
-import matplotlib.pyplot as plt
 import cv2 as cv2
 
 import torch
-import torch.nn as nn
-import torch.optim as optim
-import random
-
-import torchvision
 import torchvision.utils
-from torchvision.models import detection
-from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 
-import dataset as data
-import utils as utils
-import pickle
-import attackMethods as am
-
+import data.dataset as data
+import data.utils as utils
 
 device = torch.device("cpu")
 
-model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
+# model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
+model = torchvision.models.detection.retinanet_resnet50_fpn(pretrained=True)
 model.eval()
 model = model.float().to(device)
 
 threshold = 0.8
 
 print("Okey, im ready...")
-
-
 bot.polling(none_stop=True, interval=0)

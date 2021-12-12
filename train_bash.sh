@@ -7,5 +7,5 @@ do
 done
 
 #! /usr/bin/python
-chmod +x trainBash.py
-./trainBash.py data labels
+chmod +x train_bash.py
+./train_bash.py data labels
