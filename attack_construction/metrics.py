@@ -1,12 +1,12 @@
 import torch
 
 
-def general_objectness(labels):  # as in InvisibleCloak
-    score = torch.tensor(0.0)
+def general_objectness(labels, device):  # as in InvisibleCloak
+    score = torch.tensor(0.0).to(device)
     # score.requires_grad = True
     for i in range(len(labels["labels"])):
-        if labels["labels"][i] == 1:
-            score = + max(labels["scores"][i] + 1, 0)**2
+        if labels["labels"][i] == 1: # and labels["scores"][i] > 0.6
+            score += max(labels["scores"][i] + 1, 0)**2
     return score
 
 

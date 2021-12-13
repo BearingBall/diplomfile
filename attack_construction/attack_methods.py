@@ -4,13 +4,14 @@ import torchvision.transforms as T
 import numpy as np
 import data.utils as data_utils
 import attack_construction.attack_methods as attack_methods
+import random
 
 
 def generate_random_patch(resolution = (70,70)):
     return torch.rand(3, resolution[0], resolution[1])
 
 
-def insert_patch(image, patch, box, ratio, device):
+def insert_patch(image, patch, box, ratio, device, random_place = False):
     patch_size=(int(box[3] * ratio), int(box[2] * ratio))
 
     if patch_size[0] == 0 or patch_size[1] == 0: # cant insert patch with this box parameters
@@ -18,9 +19,9 @@ def insert_patch(image, patch, box, ratio, device):
 
     resized_patch = T.Resize(size = patch_size)(patch)
 
-    x_shift = int(box[0] + box[2]/2 - patch_size[1]/2)
-    y_shift = int(box[1] + box[3]/2  - patch_size[0]/2)
-    
+    x_shift = int(box[0] + box[2] * (random.uniform(ratio, 1-ratio) if random_place else 0.5) - patch_size[1]/2)
+    y_shift = int(box[1] + box[3] * (random.uniform(ratio, 1-ratio) if random_place else 0.5)  - patch_size[0]/2)
+
     padding = (x_shift, y_shift, image.shape[2] - x_shift - patch_size[1], image.shape[1] - y_shift - patch_size[0])
     padded_patch = T.Pad(padding=padding)(resized_patch)
     patch_mask = T.Pad(padding=padding)(torch.ones(size=(3, patch_size[0], patch_size[1]))).to(device)
@@ -43,11 +44,11 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
     with torch.no_grad():
         clear_predict = model(attacked_images)
 
-    augmented_patch = augmentations(patch)
+    augmented_patch = patch if augmentations == None else augmentations(patch)
 
     for i in range(len(attacked_images)):
         for label in labels[i]:
-            attacked_images[i] = attack_methods.insert_patch(attacked_images[i], augmented_patch, label, 0.2, device) 
+            attacked_images[i] = attack_methods.insert_patch(attacked_images[i], augmented_patch, label, 0.3, device) 
 
     predict = model(attacked_images)
 

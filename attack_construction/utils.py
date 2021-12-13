@@ -43,7 +43,7 @@ def get_patch_test(patch, image, label, model, device, loss, threshold = 0.0):
     attacked_image = image.clone()
 
     for l in label:
-        attacked_image = am.insert_patch(attacked_image, patch, l, 0.2, device) 
+        attacked_image = am.insert_patch(attacked_image, patch, l, 0.3, device) 
 
     with torch.no_grad():
         prediction = model([image, attacked_image])
