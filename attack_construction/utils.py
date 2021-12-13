@@ -13,8 +13,8 @@ def show_tensor(picture):
     plt.imshow(data_utils.tensor_to_image(picture)/255)
 
 
-def save_tensor(tensor, name):
-    with open(pathes_path + name + '.pickle', 'wb') as f:
+def save_tensor(tensor, name, external_place = False):
+    with open("" if external_place else pathes_path + name + '.pickle', 'wb') as f:
         pickle.dump(data_utils.tensor_to_image(tensor), f)
     cv2.imwrite(pathes_path + name + ".png", data_utils.tensor_to_image(tensor))
 

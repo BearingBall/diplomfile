@@ -1,8 +1,6 @@
 import sys
 sys.path.append('../')
 
-import numpy as np
-import cv2 as cv2
 
 import torch
 import torch.hub
@@ -15,7 +13,6 @@ import data.utils as data_utils
 import attack_construction.attack_methods as attack_methods
 import attack_construction.metrics as metrics
 import attack_construction.utils as attack_utils
-import pickle
 
 print(torch.__version__)
 print(torch.cuda_version)
@@ -57,7 +54,7 @@ def main(folderImages, folderLabels):
     epoches = 1
 
     def loss_function(clear_predict, predict, patch, device):
-        return metrics.general_objectness(predict) + variation_coef * metrics.total_variation(patch)
+        return metrics.general_objectness(predict, device) + variation_coef * metrics.total_variation(patch)
 
     for epoch in range(epoches):
         image_counter = 0
@@ -67,7 +64,7 @@ def main(folderImages, folderLabels):
             loss, patch = attack_methods.training_step(model, patch, augmentations, images, labels, loss_function, device, grad_rate)
             print("ep:", epoch,"epoch_progress:", image_counter/len(dataset), "loss:", loss)
 
-    attack_utils.save_tensor(patch.cpu(), "patch - new")
+    attack_utils.save_tensor(patch.cpu(), "patch - new", True)
 
 
 if __name__=='__main__':
