@@ -1,6 +1,8 @@
 import sys
 sys.path.append('../')
-
+import argparse
+import warnings
+warnings.filterwarnings("ignore")
 
 import torch
 import torch.hub
@@ -18,11 +20,24 @@ print(torch.__version__)
 print(torch.cuda_version)
 print(torchvision.__version__)
 
+parser = argparse.ArgumentParser(description = 'Train patch')
+parser.add_argument('--data', help='data folder path', required=False, default='../train2017/train2017')
+parser.add_argument('--labels', help='labels file path', required=False, default='../annotations_trainval2017/annotations/instances_train2017.json')
+parser.add_argument('--batch', help='batch size', required=False, default=1)
+parser.add_argument('--epoch', help='number of epoches', required=False, default=1)
+parser.add_argument('--rate', help='graduation rate', required=False, default=0.03)
+parser.add_argument('--device', help='0 - cpu, 1 - cuda', required=False, default=0)
 
+def main():
+    args = parser.parse_args()
+    print(args)
 
-def main(folderImages, folderLabels):
-    device = torch.device("cpu")
-    #device = torch.device("cuda:0")
+    folderImages = args.data
+    folderLabels = args.labels
+    device = torch.device("cpu") if args.device == 0 else torch.device("cuda:0")
+    batch_size = args.batch
+    grad_rate = args.rate
+    epoches = args.epoch
 
     #model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
     model = torchvision.models.detection.retinanet_resnet50_fpn(pretrained=True)
@@ -33,8 +48,6 @@ def main(folderImages, folderLabels):
         param.requires_grad = False 
 
     dataset = data.AdversarialDataset((640,640), folderImages, folderLabels) # todo: use resize to pull picture in batch
-
-    batch_size = 1
 
     train_loader  = torch.utils.data.DataLoader(dataset=dataset, batch_size=batch_size, shuffle=False)
     test_loader = torch.utils.data.DataLoader(dataset=dataset, batch_size=batch_size, shuffle=False)
@@ -50,8 +63,6 @@ def main(folderImages, folderLabels):
         torchvision.transforms.RandomRotation(degrees=(-30, 30)),])
 
     variation_coef = pow(10, -11)
-    grad_rate = 0.03
-    epoches = 1
 
     def loss_function(clear_predict, predict, patch, device):
         return metrics.general_objectness(predict, device) + variation_coef * metrics.total_variation(patch)
@@ -68,4 +79,4 @@ def main(folderImages, folderLabels):
 
 
 if __name__=='__main__':
-    main(sys.argv[1], sys.argv[2])
+    main()
