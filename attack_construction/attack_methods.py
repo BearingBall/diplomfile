@@ -3,6 +3,7 @@ import torch
 import torchvision.transforms as T
 import numpy as np
 import data.utils as data_utils
+import attack_construction.metrics as attack_metric
 import random
 
 
@@ -75,6 +76,7 @@ def validate(model, patch, augmentations, val_loader, loss_func, device):
     
     losses_before = []
     losses_after = []
+    mAPs = []
 
     for images, labels in val_loader:
         attacked_images = []
@@ -96,8 +98,10 @@ def validate(model, patch, augmentations, val_loader, loss_func, device):
 
         losses_before = losses_before + [loss_func(clear_predict[i], patch, device).detach().cpu() for i in range(len(clear_predict))]
         losses_after = losses_after + [loss_func(predict[i], patch, device).detach().cpu() for i in range(len(predict))]
+        mAPs = mAPs + [attack_metric.mean_average_precision(predict[i], labels[i]) for i in range(len(predict))]
 
-    return np.mean(np.asarray(losses_before)), np.mean(np.asarray(losses_after))
+    print(mAPs)
+    return np.mean(np.asarray(losses_before)), np.mean(np.asarray(losses_after)), np.mean(np.asarray(mAPs))
 
         
 

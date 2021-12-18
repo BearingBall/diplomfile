@@ -76,6 +76,7 @@ def main():
         torchvision.transforms.GaussianBlur(kernel_size=(5, 9), sigma=(0.1, 0.3)),
         torchvision.transforms.RandomPerspective(distortion_scale=0.2, p=1.0),
         torchvision.transforms.RandomRotation(degrees=(-30, 30)),])
+    augmentations = None
 
     variation_coef = pow(10, -11)
 
@@ -95,10 +96,10 @@ def main():
             if (eval_counter == 0):
                 eval_counter = 5
                 attack_utils.save_tensor(patch.cpu(), './' + patch_name, True)
-                loss_before, loss_after = attack_methods.validate(model, patch, augmentations, val_loader, loss_function, device)
-                print(f"patch saved. VAL: raw loss:{loss_before}, attacked:{loss_after}")
-                writer.add_scalar("Loss/val_before", loss_before, image_counter + epoch*len(dataset))
-                writer.add_scalar("Loss/val_after", loss_after, image_counter + epoch*len(dataset))
+                loss_before, loss_after, mAP = attack_methods.validate(model, patch, augmentations, val_loader, loss_function, device)
+                print(f"patch saved. VAL: raw loss:{loss_before}, attacked:{loss_after}, mAP:{mAP}")
+                writer.add_scalar("Loss/val", loss_after, image_counter + epoch * len(dataset))
+                writer.add_scalar("mAP/val", mAP, image_counter + epoch * len(dataset))
                 writer.flush()
 
             eval_counter -= 1
