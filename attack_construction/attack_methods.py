@@ -3,7 +3,6 @@ import torch
 import torchvision.transforms as T
 import numpy as np
 import data.utils as data_utils
-import attack_construction.attack_methods as attack_methods
 import random
 
 
@@ -41,21 +40,21 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
     #for attackedIm in attackedImage:
     #    attackedIm.requires_grad = True
 
-    with torch.no_grad():
-        clear_predict = model(attacked_images)
+    #with torch.no_grad():
+    #    clear_predict = model(attacked_images)
 
     augmented_patch = patch if augmentations == None else augmentations(patch)
 
     for i in range(len(attacked_images)):
         for label in labels[i]:
-            attacked_images[i] = attack_methods.insert_patch(attacked_images[i], augmented_patch, label, 0.3, device) 
+            attacked_images[i] = insert_patch(attacked_images[i], augmented_patch, label, 0.3, device) 
 
     predict = model(attacked_images)
 
     costs = []
 
-    for i in range(len(clear_predict)):
-        cost = loss(clear_predict[i], predict[i], patch, device)
+    for i in range(len(predict)):
+        cost = loss(predict[i], patch, device)
         if cost < 0.1:
             continue
         try:
@@ -70,3 +69,36 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
         attacked_image.detach()
     
     return np.mean(np.asarray(costs)), patch
+
+def validate(model, patch, augmentations, val_loader, loss_func, device):
+    torch.cuda.empty_cache()
+    
+    losses_before = []
+    losses_after = []
+
+    for images, labels in val_loader:
+        attacked_images = []
+
+        for image in images:
+            attacked_images.append(data_utils.image_to_tensor(image).to(device))
+
+        with torch.no_grad():         
+            clear_predict = model(attacked_images)
+
+        augmented_patch = patch if augmentations == None else augmentations(patch)
+
+        for i in range(len(attacked_images)):
+            for label in labels[i]:
+                attacked_images[i] = insert_patch(attacked_images[i], augmented_patch, label, 0.3, device) 
+
+        with torch.no_grad():        
+            predict = model(attacked_images)
+
+        losses_before = losses_before + [loss_func(clear_predict[i], patch, device).detach().cpu() for i in range(len(clear_predict))]
+        losses_after = losses_after + [loss_func(predict[i], patch, device).detach().cpu() for i in range(len(predict))]
+
+    return np.mean(np.asarray(losses_before)), np.mean(np.asarray(losses_after))
+
+        
+
+        
