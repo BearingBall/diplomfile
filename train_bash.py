@@ -9,6 +9,8 @@ import torch.hub
 
 import torchvision
 import torchvision.utils
+from pycocotools.coco import COCO
+from pycocotools.cocoeval import COCOeval
 
 from data import dataset as data
 import attack_construction.attack_methods as attack_methods
