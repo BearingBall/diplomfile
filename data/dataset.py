@@ -6,8 +6,12 @@ from torch.utils.data import Dataset
 
 
 class AdversarialDataset(Dataset):
-    def __init__(self, resize = None, folder_images = "../../train2017/train2017",
-                 labels_file = "../../annotations_trainval2017/annotations/instances_train2017.json"):
+    def __init__(
+            self,
+            resize=None,
+            folder_images='../../train2017/train2017',
+            labels_file='../../annotations_trainval2017/annotations/instances_train2017.json',
+    ):
         self.folder_images = folder_images
         self.labels_file = labels_file
         self.resize_param = resize
