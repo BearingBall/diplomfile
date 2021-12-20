@@ -89,7 +89,7 @@ def validate(model, patch, augmentations, val_loader, loss_func, device):
         with torch.no_grad():         
             clear_predict = model(attacked_images)
 
-        augmented_patch = patch if augmentations is not None else augmentations(patch)
+        augmented_patch = patch if augmentations is None else augmentations(patch)
 
         for i in range(len(attacked_images)):
             for label in labels[i]:
