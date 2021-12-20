@@ -1,18 +1,19 @@
-from cv2 import threshold
-import torch
 import numpy as np
+import torch
 
 
 def general_objectness(labels, device):  # as in InvisibleCloak
     score = torch.tensor(0.0).to(device)
     # score.requires_grad = True
     for i in range(len(labels["labels"])):
-        if labels["labels"][i] == 1: # and labels["scores"][i] > 0.6
+        # and labels["scores"][i] > 0.6
+        if labels["labels"][i] == 1:
             score += max(labels["scores"][i] + 1, 0)**2
     return score
 
 
-def total_variation(patch):  # TV - total variation penalthy (smooth for patch)
+# TV - total variation penalty (smooth for patch)
+def total_variation(patch):
     a1 = patch[:, :, :-1] - patch[:, :, 1:]
     a2 = patch[:, :-1, :] - patch[:, 1:, :]
     return a1.abs().sum() + a2.abs().sum()
@@ -57,7 +58,7 @@ def FN(predictions, true_boxes, score_threshold, iou_threshold):
         FN += 1
         for i in range(len(predictions['boxes'])):
             if predictions['scores'][i] > score_threshold and intersection_over_union(predictions['boxes'][i], true_boxes[j]) > iou_threshold:
-                FN -=1
+                FN -= 1
                 break
     return FN
 
