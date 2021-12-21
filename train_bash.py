@@ -81,7 +81,7 @@ def main():
         image_counter = 0
         eval_counter = 0
 
-        for images, labels in train_loader:
+        for images, labels, _ in train_loader:
             image_counter += batch_size
             loss, patch = attack_methods.training_step(model, patch, augmentations, images, labels, loss_function, device, grad_rate)
             print(f'ep:{epoch}, epoch_progress:{image_counter/len(dataset)}, batch_loss:{loss}')
@@ -90,10 +90,10 @@ def main():
             if eval_counter == 0:
                 eval_counter = 5
                 attack_utils.save_tensor(patch.cpu(), './' + patch_name, True)
-                loss_before, loss_after, mAP = attack_methods.validate(
-                    model, patch, augmentations, val_loader, loss_function, device)
-                print(f'patch saved. VAL: raw loss:{loss_before}, attacked:{loss_after}, mAP:{mAP}')
-                writer.add_scalar('Loss/val', loss_after, image_counter + epoch * len(dataset))
+                obj, tv, mAP = attack_methods.validate(model, patch, augmentations, val_loader, device, val_labels)
+                print(f'patch saved. VAL: objectness:{obj}, attacked:{tv}, mAP:{mAP}')
+                writer.add_scalar('Loss/val_obj', obj, image_counter + epoch * len(dataset))
+                writer.add_scalar('Loss/val_tv', tv, image_counter + epoch * len(dataset))
                 writer.add_scalar('mAP/val', mAP, image_counter + epoch * len(dataset))
                 writer.flush()
 

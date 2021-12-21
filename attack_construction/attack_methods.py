@@ -5,6 +5,9 @@ import numpy as np
 import data.utils as data_utils
 import attack_construction.metrics as attack_metric
 import random
+import json
+from pycocotools.coco import COCO
+from pycocotools.cocoeval import COCOeval
 
 
 def generate_random_patch(resolution = (70,70)):
@@ -73,14 +76,13 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
     
     return np.mean(np.asarray(costs)), patch
 
-def validate(model, patch, augmentations, val_loader, loss_func, device):
+def validate(model, patch, augmentations, val_loader, device, annotation_file = "../../annotations_trainval2017/annotations/instances_val2017.json"):
     torch.cuda.empty_cache()
     
-    losses_before = []
-    losses_after = []
-    mAPs = []
+    objectness = []
+    annotation_after = []
 
-    for images, labels in val_loader:
+    for images, labels, img_ids in val_loader:
         attacked_images = []
 
         for image in images:
@@ -98,11 +100,37 @@ def validate(model, patch, augmentations, val_loader, loss_func, device):
         with torch.no_grad():        
             predict = model(attacked_images)
 
-        losses_before = losses_before + [loss_func(clear_predict[i], patch, device).detach().cpu() for i in range(len(clear_predict))]
-        losses_after = losses_after + [loss_func(predict[i], patch, device).detach().cpu() for i in range(len(predict))]
-        mAPs = mAPs + [attack_metric.mean_average_precision(predict[i], labels[i]) for i in range(len(predict))]
+        for i in range(len(predict)):
+            for j in range(len(predict[i]["labels"])):
+                annotation_after.append({
+                    'image_id' : img_ids[i].item(),
+                    'category_id': predict[i]["labels"][j].item(),
+                    'bbox': [
+                        predict[i]["boxes"][j][0].item(),
+                        predict[i]["boxes"][j][1].item(),
+                        predict[i]["boxes"][j][2].item(),
+                        predict[i]["boxes"][j][3].item()
+                    ],
+                    "score": predict[i]['scores'][j].item()
+                    })
 
-    return np.mean(np.asarray(losses_before)), np.mean(np.asarray(losses_after)), np.mean(np.asarray(mAPs))
+        objectness = objectness + [attack_metric.general_objectness(predict[i], device).detach().cpu() for i in range(len(clear_predict))]
+
+    with open("tmp.json", 'w') as f_after:
+        json.dump(annotation_after, f_after)     
+
+    val_loader.dataset
+    cocoGt=COCO(annotation_file)
+    cocoDt=cocoGt.loadRes("./tmp.json")
+
+    cocoEval = COCOeval(cocoGt,cocoDt,'bbox')
+    cocoEval.params.imgIds = cocoGt.getImgIds()
+    cocoEval.evaluate()
+    cocoEval.accumulate()
+    cocoEval.summarize()
+
+    total_variation = attack_metric.total_variation(patch).detach().cpu()
+    return np.mean(np.asarray(objectness)), total_variation, np.mean(cocoEval.stats)
 
         
 

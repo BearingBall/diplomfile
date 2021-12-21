@@ -57,7 +57,7 @@ class AdversarialDataset(Dataset):
         
             image = cv2.resize(image, self.resize_param)
             
-        return image, labels_package
+        return image, labels_package, self.images[index]["id"]
 
 """
 {
