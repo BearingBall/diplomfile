@@ -6,4 +6,4 @@ def image_to_tensor(image):
 
 
 def tensor_to_image(tensor):
-    return tensor.permute(1, 2, 0).detach().numpy() * 255
+    return tensor.permute(1, 2, 0).detach().cpu().numpy() * 255
