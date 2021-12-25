@@ -153,3 +153,4 @@ trash*
 
 !3rdparty/**
 src/enot/protection/*.c
+experiments/*

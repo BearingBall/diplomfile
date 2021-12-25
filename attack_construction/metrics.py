@@ -14,7 +14,7 @@ def general_objectness(labels, device):  # as in InvisibleCloak
 
 # TV - total variation penalty (smooth for patch)
 def total_variation(patch):
+    # wiki: https://en.wikipedia.org/wiki/Total_variation_denoising
     a1 = patch[:, :, :-1] - patch[:, :, 1:]
     a2 = patch[:, :-1, :] - patch[:, 1:, :]
     return a1.abs().sum() + a2.abs().sum()
-
