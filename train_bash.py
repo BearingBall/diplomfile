@@ -15,7 +15,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 import attack_construction.attack_methods as attack_methods
 from attack_construction.utils import save_patch_tensor
-from argument_parsing import parse_command_line_args
+from argument_parsing import parse_command_line_args_train
 from attack_construction.attack_methods import adversarial_loss_function
 from data import dataset as data
 
@@ -26,7 +26,7 @@ print(torchvision.__version__)
 
 
 def main():
-    args = parse_command_line_args()
+    args = parse_command_line_args_train()
 
     train_images = args.train_data
     val_images = args.val_data
@@ -52,8 +52,8 @@ def main():
         param.requires_grad = False
 
     # TODO: use resize to pull picture in batch
-    dataset = data.AdversarialDataset(None, train_images, train_labels)
-    dataset_val = data.AdversarialDataset(None, val_images, val_labels)
+    dataset = data.AdversarialDataset((640, 640), train_images, train_labels)
+    dataset_val = data.AdversarialDataset((640, 640), val_images, val_labels)
 
     train_loader = torch.utils.data.DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True)
     small_val_loader = torch.utils.data.DataLoader(
@@ -83,7 +83,7 @@ def main():
 
     for epoch in range(epoches):
         image_counter = 0
-        for step_num, (images, labels, _) in enumerate(train_loader):
+        for step_num, (images, labels, _, _) in enumerate(train_loader):
             image_counter += batch_size
             loss, patch = attack_methods.training_step(
                 model=model,

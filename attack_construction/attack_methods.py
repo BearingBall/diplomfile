@@ -89,7 +89,7 @@ def validate(
     
     objectness = []
     annotation_after = []
-    for images, labels, img_ids in val_loader:
+    for images, labels, img_ids, scale_factor  in val_loader:
         attacked_images = []
         images = images.to(device)
 
@@ -112,10 +112,10 @@ def validate(
                     'image_id' : img_ids[i].item(),
                     'category_id': predict[i]["labels"][j].item(),
                     'bbox': [
-                        predict[i]["boxes"][j][0].item(),
-                        predict[i]["boxes"][j][1].item(),
-                        predict[i]["boxes"][j][2].item(),
-                        predict[i]["boxes"][j][3].item()
+                        predict[i]["boxes"][j][0].item() / scale_factor[0],
+                        predict[i]["boxes"][j][1].item() / scale_factor[1],
+                        predict[i]["boxes"][j][2].item() / scale_factor[0],
+                        predict[i]["boxes"][j][3].item() / scale_factor[1]
                     ],
                     "score": predict[i]['scores'][j].item()
                     })

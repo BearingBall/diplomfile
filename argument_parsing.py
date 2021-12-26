@@ -1,7 +1,7 @@
 import argparse
 
 
-def parse_command_line_args():
+def parse_command_line_args_train():
     parser = argparse.ArgumentParser(description='Train patch')
     parser.add_argument(
         '--train_data',
@@ -36,7 +36,7 @@ def parse_command_line_args():
         help='percentage of validation data',
         required=False,
         type=float,
-        default=0.001,
+        default=0.05,
     )
     parser.add_argument(
         '--batch_size',
@@ -84,5 +84,44 @@ def parse_command_line_args():
         help='save patch and validation performing frequency',
         required=False,
         default=100,
+    )
+    return parser.parse_args()
+
+
+def parse_command_line_args_filter():
+    parser = argparse.ArgumentParser(description='Annotation filter')
+    parser.add_argument(
+        '--input_path',
+        help='path to annotation file',
+        required=False,
+        type=str,
+        default='../annotations_trainval2017/annotations/instances_val2017.json',
+    )
+    parser.add_argument(
+        '--output_path',
+        help='path to result annotation file',
+        required=True,
+        type=str,
+    )
+    parser.add_argument(
+        '--is_crowd_include',
+        help='include annotations with is_crowd = True',
+        required=False,
+        type=str,
+        default=False,
+    )
+    parser.add_argument(
+        '--min_bbox_area_ratio',
+        help='min bbox_area_ratio included',
+        required=False,
+        type=str,
+        default=0.05,
+    )
+    parser.add_argument(
+        '--category',
+        help='what type of object will be filtered',
+        required=False,
+        type=str,
+        default=1,
     )
     return parser.parse_args()
