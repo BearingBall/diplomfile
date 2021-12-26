@@ -52,8 +52,8 @@ def main():
         param.requires_grad = False
 
     # TODO: use resize to pull picture in batch
-    dataset = data.AdversarialDataset((640, 640), train_images, train_labels)
-    dataset_val = data.AdversarialDataset((640, 640), val_images, val_labels)
+    dataset = data.AdversarialDataset(None, train_images, train_labels)
+    dataset_val = data.AdversarialDataset(None, val_images, val_labels)
 
     train_loader = torch.utils.data.DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True)
     small_val_loader = torch.utils.data.DataLoader(
@@ -97,15 +97,15 @@ def main():
             )
             # TODO: apply tqdm library for progress logging
             print(f'ep:{epoch}, epoch_progress:{image_counter/len(dataset)}, batch_loss:{loss}')
-            writer.add_scalar('Loss/train', loss, image_counter + epoch * len(dataset))
+            writer.add_scalar('Loss/train', loss, step_num)
 
             if step_num % step_save_frequency == 0:
                 save_patch_tensor(patch, experiment_dir, epoch=epoch, step=step_num, save_mode='both')
                 obj, tv, mAP = attack_methods.validate(model, patch, augmentations, small_val_loader, device, val_labels)
                 print(f'patch saved. VAL: objectness:{obj}, attacked:{tv}, mAP:{mAP}')
-                writer.add_scalar('Loss/val_obj', obj, image_counter + epoch * len(dataset))
-                writer.add_scalar('Loss/val_tv', tv, image_counter + epoch * len(dataset))
-                writer.add_scalar('mAP/val', mAP, image_counter + epoch * len(dataset))
+                writer.add_scalar('Loss/val_obj', obj, step_num)
+                writer.add_scalar('Loss/val_tv', tv, step_num)
+                writer.add_scalar('mAP/val', mAP, step_num)
                 writer.flush()
 
         # at least one time in epoch you need full validation

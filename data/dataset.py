@@ -25,13 +25,14 @@ class AdversarialDataset(Dataset):
     def __len__(self):
         return len(self.images)
     
-    def __getitem__(self, index):    
-        if index > len(self.images):
-            return None
-
+    def __getitem__(self, index):
         image = cv2.imread(self.folder_images + "/" + self.images[index]["file_name"])
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        if image is None:
+            raise RuntimeError(
+                f'Wrong Image path or smth: {self.folder_images + "/" + self.images[index]["file_name"]}'
+            )
 
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         indexes = [i for i in range(len(self.annotations)) if self.annotations[i]["image_id"] == self.images[index]["id"]]
 
         labels = np.asarray(self.annotations)[indexes]
@@ -54,10 +55,11 @@ class AdversarialDataset(Dataset):
                 label[1] = int(label[1] * y_ratio)
                 label[2] = min(int(label[2] * x_ratio), self.resize_param[0] - label[0])
                 label[3] = min(int(label[3] * y_ratio), self.resize_param[1] - label[1])
-        
-            image = cv2.resize(image, self.resize_param)
-            
-        return image, labels_package, self.images[index]["id"]
+
+            image = cv2.resize(image, dsize=self.resize_param)
+
+        image: np.ndarray = np.transpose(image, axes=(2, 0, 1)) / 255.
+        return torch.tensor(image.astype(np.float32)), labels_package, self.images[index]["id"]
 
 """
 {

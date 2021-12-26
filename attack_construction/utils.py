@@ -20,12 +20,12 @@ def save_patch_tensor(tensor, path, epoch=None, step=None, save_mode='both'):
 
     if save_mode == 'pickle' or save_mode == 'both':
         pickle_path = 'patch.pickle' if condition else f'patch_{epoch}_{step}.pickle'
-        with open(Path(path) / pickle_path, 'wb') as f:
+        with open(pickle_folder / pickle_path, 'wb') as f:
             pickle.dump(data_utils.tensor_to_image(tensor), f)
 
     if save_mode == 'img' or save_mode == 'both':
         img_path = 'patch.png' if epoch is None else f'patch_{epoch}_{step}.png'
-        cv2.imwrite((path / img_path).as_posix(), data_utils.tensor_to_image(tensor))
+        cv2.imwrite((image_folder / img_path).as_posix(), data_utils.tensor_to_image(tensor))
 
 
 def load_tensor_from_pickle(path_to_pickle):

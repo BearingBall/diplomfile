@@ -46,7 +46,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
     attacked_images = []
 
     for image in images:
-        attacked_images.append(data_utils.image_to_tensor(image).to(device))
+        attacked_images.append(image.to(device))
 
     augmented_patch = patch if augmentations is None else augmentations(patch)
 
@@ -84,27 +84,26 @@ def validate(
         device,
         annotation_file="../../annotations_trainval2017/annotations/instances_val2017.json",
 ):
+    model.eval()
     torch.cuda.empty_cache()
     
     objectness = []
     annotation_after = []
-
     for images, labels, img_ids in val_loader:
         attacked_images = []
+        images = images.to(device)
 
         for image in images:
-            attacked_images.append(data_utils.image_to_tensor(image).to(device))
-
-        with torch.no_grad():         
-            clear_predict = model(attacked_images)
+            attacked_images.append(image.to(device))
 
         augmented_patch = patch if augmentations is None else augmentations(patch)
 
-        for i in range(len(attacked_images)):
-            for label in labels[i]:
-                attacked_images[i] = insert_patch(attacked_images[i], augmented_patch, label, 0.3, device) 
+        if augmented_patch is not None:
+            for i, _ in enumerate(images):
+                for label in labels[i]:
+                    attacked_images[i] = (insert_patch(attacked_images[i], augmented_patch, label, 0.3, device))
 
-        with torch.no_grad():        
+        with torch.no_grad():
             predict = model(attacked_images)
 
         for i in range(len(predict)):
@@ -123,7 +122,7 @@ def validate(
 
         objectness.extend([
             attack_metric.general_objectness(predict[i], device).detach().cpu()
-            for i in range(len(clear_predict))
+            for i in range(len(attacked_images))
         ])
 
     with open("tmp.json", 'w') as f_after:
