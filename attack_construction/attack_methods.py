@@ -29,8 +29,8 @@ def insert_patch(image, patch, box, ratio, device, random_place=False):
 
     resized_patch = T.Resize(size=patch_size)(patch)
 
-    patch_x_offset = box[2] * (random.uniform(0, 1-ratio) if random_place else 0.5-ratio/2)
-    patch_y_offset = box[3] * (random.uniform(0, 1-ratio) if random_place else 0.5-ratio/2)
+    patch_x_offset = box[2] * (random.uniform(0, 1 - ratio) if random_place else 0.5 - ratio / 2)
+    patch_y_offset = box[3] * (random.uniform(0, 1 - ratio) if random_place else 0.5 - ratio / 2)
     x_shift = int(box[0] + patch_x_offset)
     y_shift = int(box[1] + patch_y_offset)
 
@@ -46,13 +46,13 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
     attacked_images = []
 
     for image in images:
-        attacked_images.append(image.to(device))
+        attacked_images.append(data_utils.image_to_tensor(image).to(device))
 
     augmented_patch = patch if augmentations is None else augmentations(patch)
 
     for i in range(len(attacked_images)):
         for label in labels[i]:
-            attacked_images[i] = insert_patch(attacked_images[i], augmented_patch, label, 0.3, device) 
+            attacked_images[i] = insert_patch(attacked_images[i], augmented_patch, label, 0.3, device)
 
     predict = model(attacked_images)
 
@@ -63,16 +63,16 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
         if cost < 0.1:
             continue
         try:
-            grad = torch.autograd.grad(cost, patch, retain_graph=False, create_graph=False,  allow_unused=True)[0]
+            grad = torch.autograd.grad(cost, patch, retain_graph=False, create_graph=False, allow_unused=True)[0]
             if grad is not None:
                 patch = patch - grad_rate * grad.sign()
         except:
-             pass
+            pass
         costs.append(cost.detach().cpu())
 
     for attacked_image in attacked_images:
         attacked_image.detach()
-    
+
     return np.mean(np.asarray(costs)), patch
 
 
@@ -86,22 +86,22 @@ def validate(
 ):
     model.eval()
     torch.cuda.empty_cache()
-    
+
     objectness = []
     annotation_after = []
     for images, labels, img_ids in val_loader:
-        attacked_images = []
+
         images = images.to(device)
-
-        for image in images:
-            attacked_images.append(image.to(device))
-
         augmented_patch = patch if augmentations is None else augmentations(patch)
 
         if augmented_patch is not None:
-            for i, _ in enumerate(images):
-                for label in labels[i]:
-                    attacked_images[i] = (insert_patch(attacked_images[i], augmented_patch, label, 0.3, device))
+            attacked_images = [
+                insert_patch(image, augmented_patch, label, 0.3, device)
+                for i, image in enumerate(images)
+                for label in labels[i]
+            ]
+        else:
+            attacked_images = [i for i in images]
 
         with torch.no_grad():
             predict = model(attacked_images)
@@ -109,7 +109,7 @@ def validate(
         for i in range(len(predict)):
             for j in range(len(predict[i]["labels"])):
                 annotation_after.append({
-                    'image_id' : img_ids[i].item(),
+                    'image_id': img_ids[i].item(),
                     'category_id': predict[i]["labels"][j].item(),
                     'bbox': [
                         predict[i]["boxes"][j][0].item(),
@@ -118,15 +118,15 @@ def validate(
                         predict[i]["boxes"][j][3].item()
                     ],
                     "score": predict[i]['scores'][j].item()
-                    })
+                })
 
         objectness.extend([
-            attack_metric.general_objectness(predict[i], device).detach().cpu()
-            for i in range(len(attacked_images))
+            attack_metric.general_objectness(single_image_predict, device).detach().cpu()
+            for single_image_predict in predict
         ])
 
     with open("tmp.json", 'w') as f_after:
-        json.dump(annotation_after, f_after)     
+        json.dump(annotation_after, f_after)
 
     cocoGt = COCO(annotation_file)
     cocoDt = cocoGt.loadRes("./tmp.json")
