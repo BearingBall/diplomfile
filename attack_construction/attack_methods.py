@@ -43,16 +43,14 @@ def insert_patch(image, patch, box, ratio, device, random_place=False):
 
 def training_step(model, patch, augmentations, images, labels, loss, device, grad_rate):
     torch.cuda.empty_cache()
-    attacked_images = []
 
-    for image in images:
-        attacked_images.append(data_utils.image_to_tensor(image).to(device))
+    attacked_images = list(images)
 
     augmented_patch = patch if augmentations is None else augmentations(patch)
 
-    for i in range(len(attacked_images)):
-        for label in labels[i]:
-            attacked_images[i] = insert_patch(attacked_images[i], augmented_patch, label, 0.3, device)
+    for i, attacked_image in enumerate(attacked_images):
+        for label in labels[i-1]:
+            attacked_image = insert_patch(attacked_image, augmented_patch, label, 0.3, device)
 
     predict = model(attacked_images)
 
@@ -113,10 +111,10 @@ def validate(
                     'image_id': img_ids[i].item(),
                     'category_id': predict[i]["labels"][j].item(),
                     'bbox': [
-                        predict[i]["boxes"][j][0].item() / scale_factor[0],
-                        predict[i]["boxes"][j][1].item() / scale_factor[1],
-                        predict[i]["boxes"][j][2].item() / scale_factor[0],
-                        predict[i]["boxes"][j][3].item() / scale_factor[1]
+                        predict[i]["boxes"][j][0].item() / scale_factor[0][0],
+                        predict[i]["boxes"][j][1].item() / scale_factor[0][1],
+                        predict[i]["boxes"][j][2].item() / scale_factor[0][0],
+                        predict[i]["boxes"][j][3].item() / scale_factor[0][1]
                     ],
                     "score": predict[i]['scores'][j].item()
                 })

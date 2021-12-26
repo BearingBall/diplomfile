@@ -53,7 +53,7 @@ class AdversarialDataset(Dataset):
             x_ratio = self.resize_param[0]/image.shape[1]
             y_ratio = self.resize_param[1]/image.shape[0]
 
-            scale_factor = torch.tensor((x_ratio, y_ratio))
+            scale_factor = torch.tensor([x_ratio, y_ratio])
 
             for label in labels_package:
                 label[0] = int(label[0] * x_ratio)
@@ -64,7 +64,7 @@ class AdversarialDataset(Dataset):
             image = cv2.resize(image, dsize=self.resize_param)
 
         image: np.ndarray = np.transpose(image, axes=(2, 0, 1)) / 255.
-        return torch.tensor(image.astype(np.float32)), labels_package, self.images[index]["id"], image_size
+        return torch.tensor(image.astype(np.float32)), labels_package, self.images[index]["id"], scale_factor
 
 """
 {
