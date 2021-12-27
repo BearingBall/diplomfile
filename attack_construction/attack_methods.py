@@ -44,7 +44,7 @@ def insert_patch(image, patch, box, ratio, device, random_place=False):
 def training_step(model, patch, augmentations, images, labels, loss, device, grad_rate):
     torch.cuda.empty_cache()
 
-    attacked_images = list(images)
+    attacked_images = [image.to(device) for image in images]
 
     augmented_patch = patch if augmentations is None else augmentations(patch)
 
@@ -111,10 +111,10 @@ def validate(
                     'image_id': img_ids[i].item(),
                     'category_id': predict[i]["labels"][j].item(),
                     'bbox': [
-                        predict[i]["boxes"][j][0].item() / scale_factor[0][0],
-                        predict[i]["boxes"][j][1].item() / scale_factor[0][1],
-                        predict[i]["boxes"][j][2].item() / scale_factor[0][0],
-                        predict[i]["boxes"][j][3].item() / scale_factor[0][1]
+                        predict[i]["boxes"][j][0].item() / scale_factor[i][0],
+                        predict[i]["boxes"][j][1].item() / scale_factor[i][1],
+                        predict[i]["boxes"][j][2].item() / scale_factor[i][0],
+                        predict[i]["boxes"][j][3].item() / scale_factor[i][1]
                     ],
                     "score": predict[i]['scores'][j].item()
                 })
