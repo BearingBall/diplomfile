@@ -17,7 +17,8 @@ def main():
 
     result = {
         'images': [],
-        'annotations': []
+        'annotations': [],
+        'categories': input_data['categories']
     }
 
     for annotation in input_data['annotations']:
