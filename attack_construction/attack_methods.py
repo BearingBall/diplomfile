@@ -108,8 +108,8 @@ def validate(
                     'bbox': [
                         predict[i]["boxes"][j][0].item() / scale_factor[i][0].item(),
                         predict[i]["boxes"][j][1].item() / scale_factor[i][1].item(),
-                        predict[i]["boxes"][j][2].item() / scale_factor[i][0].item(),
-                        predict[i]["boxes"][j][3].item() / scale_factor[i][1].item()
+                        (predict[i]["boxes"][j][2].item() - predict[i]["boxes"][j][0].item()) / scale_factor[i][0].item(),
+                        (predict[i]["boxes"][j][3].item() - predict[i]["boxes"][j][1].item()) / scale_factor[i][1].item()
                     ],
                     "score": predict[i]['scores'][j].item()
                 })
