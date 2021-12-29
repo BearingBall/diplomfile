@@ -53,18 +53,18 @@ def main():
 
     # TODO: use resize to pull picture in batch
     dataset = data.AdversarialDataset((640, 640), train_images, train_labels)
-    dataset_val = data.AdversarialDataset((640, 640), val_images, val_labels)
+    dataset_val = data.AdversarialDataset(None, val_images, val_labels)
 
     train_loader = torch.utils.data.DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True)
     small_val_loader = torch.utils.data.DataLoader(
         dataset=torch.utils.data.Subset(dataset_val, range(0, int(len(dataset_val) * val_pecentage))),
-        batch_size=batch_size,
+        batch_size=1, # just for test not batch_size
         shuffle=False,
     )
 
     val_loader = torch.utils.data.DataLoader(
         dataset=torch.utils.data.Subset(dataset_val, range(0, int(len(dataset_val) * val_pecentage))),
-        batch_size=batch_size,
+        batch_size=1,
         shuffle=True,
     )
 
