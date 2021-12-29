@@ -88,13 +88,8 @@ def validate(
     objectness = []
     annotation_after = []
     for images, labels, img_ids, scale_factor  in val_loader:
-        attacked_images = []
-        images = images.to(device)
+        attacked_images = images.to(device)
 
-        for image in images:
-            attacked_images.append(image.to(device))
-
-        images = images.to(device)
         augmented_patch = patch if augmentations is None else augmentations(patch)
 
         if augmented_patch is not None:
