@@ -14,8 +14,6 @@ import attack_construction.metrics as metrics
 
 
 def adversarial_loss_function_batch(predicts, patch, device, tv_scale):
-    print(len(predicts))
-    print(predicts[0])
     return [adversarial_loss_function(predict, patch, device, tv_scale) for predict in predicts]
 
 
@@ -61,7 +59,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
 
     predict = model(attacked_images)
 
-    costs = loss(predict, patch, device).detach().cpu()
+    costs = loss(predict, patch, device)
 
     grad = torch.autograd.grad(costs, patch, retain_graph=False, create_graph=False, allow_unused=True)[0]
 
@@ -72,7 +70,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
     for attacked_image in attacked_images:
         attacked_image.detach()
 
-    return np.mean(np.asarray(costs)), patch
+    return np.mean(np.asarray([cost.detach().numpy() for cost in costs])), patch
 
 
 def validate(

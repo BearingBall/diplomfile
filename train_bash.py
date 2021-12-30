@@ -16,7 +16,7 @@ from torch.utils.tensorboard import SummaryWriter
 import attack_construction.attack_methods as attack_methods
 from attack_construction.utils import save_patch_tensor
 from argument_parsing import parse_command_line_args_train
-from attack_construction.attack_methods import adversarial_loss_function
+from attack_construction.attack_methods import adversarial_loss_function_batch
 from data import dataset as data
 
 print(torch.__version__)
@@ -79,7 +79,7 @@ def main():
         torchvision.transforms.RandomRotation(degrees=(-30, 30)),
     ])
 
-    loss_function = partial(adversarial_loss_function, tv_scale=args.tv_scale)
+    loss_function = partial(adversarial_loss_function_batch, tv_scale=args.tv_scale)
 
     for epoch in range(epoches):
         image_counter = 0
