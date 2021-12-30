@@ -14,6 +14,8 @@ import attack_construction.metrics as metrics
 
 
 def adversarial_loss_function_batch(predicts, patch, device, tv_scale):
+    print(len(predicts))
+    print(predicts[0])
     return [adversarial_loss_function(predict, patch, device, tv_scale) for predict in predicts]
 
 
