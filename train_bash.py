@@ -103,7 +103,14 @@ def main():
                 save_patch_tensor(patch, experiment_dir, epoch=epoch, step=step_num, save_mode='both')
                 validate_dir = experiment_dir / ('validate_epoch_' + str(epoch) + '_step_' + str(step_num))
                 validate_dir.mkdir(parents=True, exist_ok=True)
-                obj, tv, mAP = attack_methods.validate(model, patch, augmentations, small_val_loader, device, val_labels, validate_dir.as_posix())
+                obj, tv, mAP = attack_methods.validate(
+                    model, 
+                    patch, 
+                    augmentations, 
+                    small_val_loader, 
+                    device, 
+                    val_labels, 
+                    validate_dir.as_posix())
                 print(f'patch saved. VAL: objectness:{obj}, attacked:{tv}, mAP:{mAP}')
                 writer.add_scalar('Loss/val_obj', obj, step_num)
                 writer.add_scalar('Loss/val_tv', tv, step_num)
@@ -114,7 +121,14 @@ def main():
         save_patch_tensor(patch, experiment_dir, epoch=epoch, step=step_num)
         validate_dir = experiment_dir / ('validate_epoch_' + str(epoch) + '_step_' + str(step_num))
         validate_dir.mkdir(parents=True, exist_ok=True)
-        obj, tv, mAP = attack_methods.validate(model, patch, augmentations, val_loader, device, val_labels, validate_dir.as_posix())
+        obj, tv, mAP = attack_methods.validate(
+            model, 
+            patch, 
+            augmentations, 
+            val_loader, 
+            device, 
+            val_labels, 
+            validate_dir.as_posix())
         print(f'patch saved. VAL: objectness:{obj}, attacked:{tv}, mAP:{mAP}')
         writer.add_scalar('Loss/val_obj', obj, epoch)
         writer.add_scalar('Loss/val_tv', tv, epoch)

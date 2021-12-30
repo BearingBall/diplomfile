@@ -13,6 +13,10 @@ import data.utils as data_utils
 import attack_construction.metrics as metrics
 
 
+def adversarial_loss_function_batch(predicts, patch, device, tv_scale):
+    return [adversarial_loss_function(predict, patch, device, tv_scale) for predict in predicts]
+
+
 def adversarial_loss_function(predict, patch, device, tv_scale):
     return metrics.general_objectness(predict, device) + tv_scale * metrics.total_variation(patch)
 
@@ -55,18 +59,13 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
 
     predict = model(attacked_images)
 
-    costs = []
+    costs = loss(predict, patch, device).detach().cpu()
 
-    for i in range(len(predict)):
-        cost = loss(predict[i], patch, device)
-        if cost < 0.1:
-            continue
+    grad = torch.autograd.grad(costs, patch, retain_graph=False, create_graph=False, allow_unused=True)[0]
 
-        grad = torch.autograd.grad(cost, patch, retain_graph=False, create_graph=False, allow_unused=True)[0]
-        if grad is not None:
-            patch = patch - grad_rate * grad.sign()
+    if grad is not None:
+        patch = patch - grad_rate * grad.sign()
 
-        costs.append(cost.detach().cpu())
 
     for attacked_image in attacked_images:
         attacked_image.detach()
@@ -121,6 +120,8 @@ def validate(
             attack_metric.general_objectness(single_image_predict, device).detach().cpu()
             for single_image_predict in predict
         ])
+        '''
+        it will be fixed soon
 
         if example_batch_num == val_idx and example_file is not None:
             for j, image in enumerate(images):
@@ -137,7 +138,7 @@ def validate(
 
             with open(example_file + '/' + "scale_factors.json", 'w') as file:
                 json.dump(scale_factor.numpy(), file)
-            
+        ''' 
     with open("tmp.json", 'w') as f_after:
         json.dump(annotation_after, f_after)
 
