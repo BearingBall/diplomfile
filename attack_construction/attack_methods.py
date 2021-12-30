@@ -70,7 +70,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
     for attacked_image in attacked_images:
         attacked_image.detach()
 
-    return np.mean(np.asarray([cost.detach().numpy() for cost in costs])), patch
+    return np.mean(np.asarray([cost.detach().cpu().numpy() for cost in costs])), patch
 
 
 def validate(
