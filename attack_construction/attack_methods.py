@@ -2,6 +2,7 @@ import json
 import random
 
 import numpy as np
+import cv2 as cv
 import torch
 import torchvision.transforms as T
 from pycocotools.coco import COCO
@@ -81,13 +82,16 @@ def validate(
         val_loader,
         device,
         annotation_file="../../annotations_trainval2017/annotations/instances_val2017.json",
+        example_file=None
 ):
     model.eval()
     torch.cuda.empty_cache()
 
+    example_batch_num = random.randint(0, len(val_loader))
+
     objectness = []
     annotation_after = []
-    for images, labels, img_ids, scale_factor  in val_loader:
+    for i, (images, labels, img_ids, scale_factor) in enumerate(val_loader):
         attacked_images = images.to(device)
 
         augmented_patch = patch if augmentations is None else augmentations(patch)
@@ -119,6 +123,22 @@ def validate(
             for single_image_predict in predict
         ])
 
+        if example_batch_num == i and example_file is not None:
+            for j, image in enumerate(images):
+                cv.imwrite(example_file + '/' + str(j) + ".png", image.numpy())
+
+            with open(example_file + '/' + "gt.json", 'w') as file:
+                json.dump(labels.item(), file)
+            
+            with open(example_file + '/' + "predict.json", 'w') as file:
+                json.dump(predict.item(), file)
+            
+            with open(example_file + '/' + "indxs.json", 'w') as file:
+                json.dump(img_ids.item(), file)
+
+            with open(example_file + '/' + "scale_factors.json", 'w') as file:
+                json.dump(scale_factor.item(), file)
+            
     with open("tmp.json", 'w') as f_after:
         json.dump(annotation_after, f_after)
 

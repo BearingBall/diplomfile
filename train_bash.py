@@ -105,6 +105,7 @@ def main():
                 validate_dir = experiment_dir / ('validate_epoch_' + str(epoch) + '_step_' + str(step_num))
                 validate_dir.mkdir(parents=True, exist_ok=True)
                 
+                
 
                 print(f'patch saved. VAL: objectness:{obj}, attacked:{tv}, mAP:{mAP}')
                 writer.add_scalar('Loss/val_obj', obj, step_num)
