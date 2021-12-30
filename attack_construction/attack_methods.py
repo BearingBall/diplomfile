@@ -61,12 +61,11 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
         cost = loss(predict[i], patch, device)
         if cost < 0.1:
             continue
-        try:
-            grad = torch.autograd.grad(cost, patch, retain_graph=False, create_graph=False, allow_unused=True)[0]
-            if grad is not None:
-                patch = patch - grad_rate * grad.sign()
-        except:
-            pass
+
+        grad = torch.autograd.grad(cost, patch, retain_graph=False, create_graph=False, allow_unused=True)[0]
+        if grad is not None:
+            patch = patch - grad_rate * grad.sign()
+            
         costs.append(cost.detach().cpu())
 
     for attacked_image in attacked_images:
