@@ -65,7 +65,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
         grad = torch.autograd.grad(cost, patch, retain_graph=False, create_graph=False, allow_unused=True)[0]
         if grad is not None:
             patch = patch - grad_rate * grad.sign()
-            
+
         costs.append(cost.detach().cpu())
 
     for attacked_image in attacked_images:
@@ -90,7 +90,7 @@ def validate(
 
     objectness = []
     annotation_after = []
-    for i, (images, labels, img_ids, scale_factor) in enumerate(val_loader):
+    for val_idx, (images, labels, img_ids, scale_factor) in enumerate(val_loader):
         attacked_images = images.to(device)
 
         augmented_patch = patch if augmentations is None else augmentations(patch)
@@ -122,21 +122,21 @@ def validate(
             for single_image_predict in predict
         ])
 
-        if example_batch_num == i and example_file is not None:
+        if example_batch_num == val_idx and example_file is not None:
             for j, image in enumerate(images):
                 cv.imwrite(example_file + '/' + str(j) + ".png", image.numpy())
 
             with open(example_file + '/' + "gt.json", 'w') as file:
-                json.dump(labels.item(), file)
+                json.dump(labels.numpy(), file)
             
             with open(example_file + '/' + "predict.json", 'w') as file:
-                json.dump(predict.item(), file)
+                json.dump(predict.numpy(), file)
             
             with open(example_file + '/' + "indxs.json", 'w') as file:
-                json.dump(img_ids.item(), file)
+                json.dump(img_ids.numpy(), file)
 
             with open(example_file + '/' + "scale_factors.json", 'w') as file:
-                json.dump(scale_factor.item(), file)
+                json.dump(scale_factor.numpy(), file)
             
     with open("tmp.json", 'w') as f_after:
         json.dump(annotation_after, f_after)
