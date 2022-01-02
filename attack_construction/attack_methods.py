@@ -9,6 +9,7 @@ from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
 
 import attack_construction.metrics as attack_metric
+from attack_construction.utils import visualize_labels_predicted, visualize_labels_gt
 import data.utils as data_utils
 import attack_construction.metrics as metrics
 
@@ -120,25 +121,13 @@ def validate(
             attack_metric.general_objectness(single_image_predict, device).detach().cpu()
             for single_image_predict in predict
         ])
-        '''
-        it will be fixed soon
 
         if example_batch_num == val_idx and example_file is not None:
-            for j, image in enumerate(images):
-                cv.imwrite(example_file + '/' + str(j) + ".png", image.numpy())
+            for j, (image) in enumerate(images):
+                image = cv.cvtColor(image, cv.COLOR_RGB2BGR)
+                cv.imwrite((example_file / (str(j) + "_gt.png")).as_posix(), visualize_labels_gt(data_utils.tensor_to_image(image), labels[j]))
+                cv.imwrite((example_file / (str(j) + "_predicted.png")).as_posix(), visualize_labels_predicted(data_utils.tensor_to_image(image), predict[j], 0.5))
 
-            with open(example_file + '/' + "gt.json", 'w') as file:
-                json.dump(labels.numpy(), file)
-            
-            with open(example_file + '/' + "predict.json", 'w') as file:
-                json.dump(predict.numpy(), file)
-            
-            with open(example_file + '/' + "indxs.json", 'w') as file:
-                json.dump(img_ids.numpy(), file)
-
-            with open(example_file + '/' + "scale_factors.json", 'w') as file:
-                json.dump(scale_factor.numpy(), file)
-        ''' 
     with open("tmp.json", 'w') as f_after:
         json.dump(annotation_after, f_after)
 

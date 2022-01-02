@@ -110,7 +110,7 @@ def main():
                     small_val_loader, 
                     device, 
                     val_labels, 
-                    validate_dir.as_posix())
+                    validate_dir)
                 print(f'patch saved. VAL: objectness:{obj}, attacked:{tv}, mAP:{mAP}')
                 writer.add_scalar('Loss/val_obj', obj, step_num)
                 writer.add_scalar('Loss/val_tv', tv, step_num)
@@ -128,7 +128,7 @@ def main():
             val_loader, 
             device, 
             val_labels, 
-            validate_dir.as_posix())
+            validate_dir)
         print(f'patch saved. VAL: objectness:{obj}, attacked:{tv}, mAP:{mAP}')
         writer.add_scalar('Loss/val_obj', obj, epoch)
         writer.add_scalar('Loss/val_tv', tv, epoch)

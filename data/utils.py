@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 
 
 def image_to_tensor(image):
@@ -6,4 +7,4 @@ def image_to_tensor(image):
 
 
 def tensor_to_image(tensor):
-    return tensor.permute(1, 2, 0).detach().cpu().numpy() * 255
+    return (tensor.permute(1, 2, 0).detach().cpu().numpy() * 255).astype(np.uint8)

@@ -1,4 +1,5 @@
 import cv2 as cv2
+import numpy as np
 import matplotlib.pyplot as plt
 import attack_construction.attack_methods as am
 import pickle
@@ -38,7 +39,9 @@ def load_tensor_from_image(path_to_image):
     return data_utils.image_to_tensor(image)
 
 
-def visualize_labels(image, labels, threshold):
+def visualize_labels_predicted(image, labels, threshold):
+    image = np.ascontiguousarray(image.copy(), dtype=np.uint8)
+
     for i in range(len(labels["labels"])):
 
         if labels["scores"][i] < threshold:
@@ -62,6 +65,16 @@ def visualize_labels(image, labels, threshold):
                 lineType=cv2.LINE_AA,
                 bottomLeftOrigin=False,
             )
+    return image
+
+
+def visualize_labels_gt(image, labels):
+    image = np.ascontiguousarray(image.copy(), dtype=np.uint8)
+    for label in labels:
+        pt1 = (int(label[0]), int(label[1]))
+        pt2 = (int(label[0] + label[2]), int(label[1] + label[3]))
+        border_color = (255, 0, 0)
+        image = cv2.rectangle(img=image, pt1=pt1, pt2=pt2, color=border_color, thickness=1)
     return image
 
 
