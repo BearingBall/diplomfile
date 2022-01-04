@@ -32,13 +32,13 @@ def main():
     val_images = args.val_data
     train_labels = args.train_labels
     val_labels = args.val_labels
-    device = torch.device("cpu") if args.device == 0 else torch.device("cuda:0")
+    device = torch.device("cpu") if int(args.device) == 0 else torch.device("cuda:0")
     batch_size = args.batch_size
     grad_rate = args.rate
     epoches = args.epochs
     experiment_dir = Path(args.experiment_dir)
     val_pecentage = args.val_part
-    step_save_frequency = args.step_save_frequency
+    step_save_frequency = int(args.step_save_frequency)
 
     # need for good experiment logging creation
     experiment_dir.mkdir(parents=True, exist_ok=True)
