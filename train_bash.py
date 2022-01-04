@@ -82,12 +82,11 @@ def main():
 
     augmentations = torchvision.transforms.Compose([
         torchvision.transforms.ColorJitter(brightness=0.4, contrast=0.2, saturation=0.2, hue=0.05),
-        torchvision.transforms.GaussianBlur(kernel_size=(5, 9), sigma=(0.1, 0.3)),
-        torchvision.transforms.RandomPerspective(distortion_scale=0.2, p=1.0),
-        torchvision.transforms.RandomRotation(degrees=(-30, 30)),
+        torchvision.transforms.GaussianBlur(kernel_size=(5, 9), sigma=(0.1, 0.2)),
+        torchvision.transforms.RandomRotation(degrees=(-5, 5)),
     ])
 
-    augmentations = None
+    #augmentations = None
 
     loss_function = partial(adversarial_loss_function_batch, tv_scale=args.tv_scale)
 
