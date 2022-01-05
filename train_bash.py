@@ -7,7 +7,6 @@ warnings.filterwarnings("ignore")
 from functools import partial
 from pathlib import Path
 
-import numpy as np
 import torch
 import torch.hub
 import torchvision
@@ -59,7 +58,7 @@ def main():
     train_loader = torch.utils.data.DataLoader(
         dataset=dataset, 
         batch_size=batch_size, 
-        shuffle=False, 
+        shuffle=True, 
         num_workers=10
     )
 
@@ -94,9 +93,8 @@ def main():
     for epoch in range(epoches):
         image_counter = 0
         for step_num, (images, labels, _, _) in enumerate(train_loader):
-            for l in range(1000):
-                image_counter += batch_size
-                loss, patch = attack_methods.training_step(
+            image_counter += batch_size
+            loss, patch = attack_methods.training_step(
                 model=model,
                 patch=patch,
                 augmentations=None,
@@ -105,11 +103,11 @@ def main():
                 loss=loss_function,
                 device=device,
                 grad_rate=grad_rate,
-                )
+            )
             # TODO: apply tqdm library for progress logging
-                print(f"ep:{epoch}, epoch_progress:{image_counter/len(dataset)}, batch_loss:{loss} ", np.sum(patch.detach().cpu().numpy()))
-                writer.add_scalar('Loss/train', loss, step_num)
-            '''
+            print(f"ep:{epoch}, epoch_progress:{image_counter/len(dataset)}, batch_loss:{loss}")
+            writer.add_scalar('Loss/train', loss, step_num)
+
             if step_num % step_save_frequency == 0:
                 save_patch_tensor(patch, experiment_dir, epoch=epoch, step=step_num, save_mode='both')
                 validate_dir = experiment_dir / ('validate_epoch_' + str(epoch) + '_step_' + str(step_num))
@@ -127,9 +125,7 @@ def main():
                 writer.add_scalar('Loss/val_tv', tv, step_num)
                 writer.add_scalar('mAP/val', mAP, step_num)
                 writer.flush()
-            '''
-            break
-        '''
+
         # at least one time in epoch you need full validation
         save_patch_tensor(patch, experiment_dir, epoch=epoch, step=step_num)
         validate_dir = experiment_dir / ('validate_epoch_' + str(epoch) + '_step_' + str(step_num))
@@ -142,13 +138,12 @@ def main():
             device, 
             val_labels, 
             validate_dir)
-        
         print(f'patch saved. VAL: objectness:{obj}, attacked:{tv}, mAP:{mAP}')
         writer.add_scalar('Loss/val_obj', obj, epoch)
         writer.add_scalar('Loss/val_tv', tv, epoch)
         writer.add_scalar('mAP/val', mAP, epoch)
         writer.flush()
-        '''
+
     writer.close()
 
 
