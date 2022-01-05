@@ -7,6 +7,7 @@ warnings.filterwarnings("ignore")
 from functools import partial
 from pathlib import Path
 
+import numpy as np
 import torch
 import torch.hub
 import torchvision
@@ -106,7 +107,7 @@ def main():
                 grad_rate=grad_rate,
                 )
             # TODO: apply tqdm library for progress logging
-                print(f"ep:{epoch}, epoch_progress:{image_counter/len(dataset)}, batch_loss:{loss}")
+                print(f"ep:{epoch}, epoch_progress:{image_counter/len(dataset)}, batch_loss:{loss} ", np.sum(patch.detach().cpu().numpy()))
                 writer.add_scalar('Loss/train', loss, step_num)
             '''
             if step_num % step_save_frequency == 0:
