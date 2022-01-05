@@ -49,7 +49,7 @@ def main():
     model = model.float().to(device)
 
     for param in model.parameters():
-        param.requires_grad = False
+        param.requires_grad = True
 
     # TODO: use resize to pull picture in batch
     dataset = data.AdversarialDataset((640, 640), train_images, train_labels)
