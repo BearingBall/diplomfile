@@ -62,7 +62,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
 
     costs = loss(predict, patch, device)
 
-    grad = torch.autograd.grad(costs, patch, retain_graph=False, create_graph=False, allow_unused=True)[0]
+    grad = torch.autograd.grad(np.sum(costs), [patch], retain_graph=False, create_graph=False, allow_unused=True)[0]
 
     print("grad ", grad.shape, ' ', np.sum(grad.detach().cpu().numpy()))
 
