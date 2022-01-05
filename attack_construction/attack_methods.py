@@ -69,7 +69,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
     #if grad is not None:
     #    patch = patch - grad_rate * grad.sign()
 
-    print('patch: ', np.sum(patch.detach().cpu().numpy()))
+    #print('patch: ', np.sum(patch.detach().cpu().numpy()))
 
     for attacked_image in attacked_images:
         attacked_image.detach()
