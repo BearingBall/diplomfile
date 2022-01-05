@@ -60,6 +60,9 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
 
     predict = model(attacked_images)
 
+    print(attacked_image.requared_grad)
+    print(predict.requared_grad)
+
     costs = loss(predict, patch, device)
 
     print(predict[0]['scores'][0])
