@@ -64,7 +64,8 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
 
     grad = torch.autograd.grad(costs, patch, retain_graph=False, create_graph=False, allow_unused=True)
 
-    print(grad.shape)
+    print(grad[0].shape)
+    print(grad)
 
     #if grad is not None:
     #    patch = patch - grad_rate * grad.sign()
