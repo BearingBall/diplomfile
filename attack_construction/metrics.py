@@ -4,7 +4,7 @@ import torch
 
 def general_objectness(labels, device):  # as in InvisibleCloak
     score = torch.tensor(0.0).to(device)
-    # score.requires_grad = True
+    score.requires_grad = True
     for i in range(len(labels["labels"])):
         # and labels["scores"][i] > 0.6
         if labels["labels"][i] == 1:
