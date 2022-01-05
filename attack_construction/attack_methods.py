@@ -50,6 +50,9 @@ def insert_patch(image, patch, box, ratio, device, random_place=False):
 def training_step(model, patch, augmentations, images, labels, loss, device, grad_rate):
     torch.cuda.empty_cache()
 
+    for image in images:
+        image.requires_grad = True
+
     attacked_images = [image.to(device) for image in images]
 
     augmented_patch = patch if augmentations is None else augmentations(patch)
