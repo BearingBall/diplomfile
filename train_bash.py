@@ -93,8 +93,9 @@ def main():
     for epoch in range(epoches):
         image_counter = 0
         for step_num, (images, labels, _, _) in enumerate(train_loader):
-            image_counter += batch_size
-            loss, patch = attack_methods.training_step(
+            for l in range(1000):
+                image_counter += batch_size
+                loss, patch = attack_methods.training_step(
                 model=model,
                 patch=patch,
                 augmentations=None,
@@ -103,10 +104,10 @@ def main():
                 loss=loss_function,
                 device=device,
                 grad_rate=grad_rate,
-            )
+                )
             # TODO: apply tqdm library for progress logging
-            print(f"ep:{epoch}, epoch_progress:{image_counter/len(dataset)}, batch_loss:{loss}")
-            writer.add_scalar('Loss/train', loss, step_num)
+                print(f"ep:{epoch}, epoch_progress:{image_counter/len(dataset)}, batch_loss:{loss}")
+                writer.add_scalar('Loss/train', loss, step_num)
             '''
             if step_num % step_save_frequency == 0:
                 save_patch_tensor(patch, experiment_dir, epoch=epoch, step=step_num, save_mode='both')
