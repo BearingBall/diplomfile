@@ -50,6 +50,8 @@ def insert_patch(image, patch, box, ratio, device, random_place=False):
 def training_step(model, patch, augmentations, images, labels, loss, device, grad_rate):
     torch.cuda.empty_cache()
 
+    patch.requires_grad = True
+
     attacked_images = [image.to(device) for image in images]
 
     augmented_patch = patch if augmentations is None else augmentations(patch)
@@ -64,6 +66,8 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
 
     grad = torch.autograd.grad(outputs=sum(sum(sum(sum(attacked_images)))), inputs=patch, retain_graph=True, create_graph=True, allow_unused=True)[0]
 
+    patch = patch.detach()
+
     if grad is None:
         print('grad None')
     else:
@@ -72,9 +76,6 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
 
     #if grad is not None:
     #    patch = patch - grad_rate * grad.sign()
-
-    for attacked_image in attacked_images:
-        attacked_image.detach()
 
     return np.mean(np.asarray([cost.detach().cpu().numpy() for cost in costs])), patch
 
