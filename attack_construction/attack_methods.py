@@ -58,7 +58,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
         for label in labels[i-1]:
             attacked_image = insert_patch(attacked_image, augmented_patch, label, 0.3, device)
 
-    predict = model([patch])
+    predict = model(attacked_image)
 
     costs = loss(predict, patch, device)
 
