@@ -56,6 +56,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
 
     for i, attacked_image in enumerate(attacked_images):
         for label in labels[i-1]:
+            print(label)
             attacked_image = insert_patch(attacked_image, augmented_patch, label, 0.3, device)
 
     predict = model(attacked_images)
