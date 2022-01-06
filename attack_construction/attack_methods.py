@@ -56,20 +56,19 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
 
     for i, attacked_image in enumerate(attacked_images):
         for label in labels[i-1]:
-            print(label)
             attacked_image = insert_patch(attacked_image, augmented_patch, label, 0.3, device)
 
     predict = model(attacked_images)
 
     costs = loss(predict, patch, device)
 
-    grad = torch.autograd.grad(outputs=costs, inputs=patch, retain_graph=True, create_graph=True, allow_unused=True)[0]
+    grad = torch.autograd.grad(outputs=sum(sum(sum(sum(attacked_images)))), inputs=patch, retain_graph=True, create_graph=True, allow_unused=True)[0]
 
     if grad is None:
         print('grad None')
     else:
         print("grad ", grad.shape, ' ', np.sum(grad.detach().cpu().numpy()))
-        print(grad)
+        #print(grad)
 
     #if grad is not None:
     #    patch = patch - grad_rate * grad.sign()
