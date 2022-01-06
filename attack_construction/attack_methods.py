@@ -68,6 +68,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
         print('grad None')
     else:
         print("grad ", grad.shape, ' ', np.sum(grad.detach().cpu().numpy()))
+        print(grad)
 
     #if grad is not None:
     #    patch = patch - grad_rate * grad.sign()
