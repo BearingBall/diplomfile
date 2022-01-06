@@ -42,7 +42,7 @@ def insert_patch(image, patch, box, ratio, device, random_place=False):
 
     padding = (x_shift, y_shift, image.shape[2] - x_shift - patch_size[1], image.shape[1] - y_shift - patch_size[0])
     padded_patch = T.Pad(padding=padding)(resized_patch)
-    patch_mask = T.Pad(padding=padding)(torch.ones(size=(3, patch_size[0], patch_size[1])))
+    patch_mask = T.Pad(padding=padding)(torch.ones(size=(3, patch_size[0], patch_size[1]))).to(device)
     result = padded_patch + (torch.ones_like(image) - patch_mask) * image
     return result
 
