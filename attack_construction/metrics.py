@@ -8,7 +8,7 @@ def general_objectness(labels, device):  # as in InvisibleCloak
         # and labels["scores"][i] > 0.6
         if labels["labels"][i] == 1:
             scores.append(max(labels["scores"][i] + 1, 0)**2)
-    return sum(scores)
+    return torch.sum(scores)
 
 
 # TV - total variation penalty (smooth for patch)
