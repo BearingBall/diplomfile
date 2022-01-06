@@ -3,12 +3,12 @@ import torch
 
 
 def general_objectness(labels, device):  # as in InvisibleCloak
-    scores = []
+    score = torch.zero_
     for i in range(len(labels["labels"])):
         # and labels["scores"][i] > 0.6
         if labels["labels"][i] == 1:
-            scores.append(max(labels["scores"][i] + 1, 0)**2)
-    return torch.sum(scores)
+            score += max(labels["scores"][i] + 1, 0)**2
+    return score
 
 
 # TV - total variation penalty (smooth for patch)
