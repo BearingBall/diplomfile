@@ -52,7 +52,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
 
     patch.requires_grad = True
 
-    attacked_images = [torch.tensor(image.to(device).clone(), requires_grad = True) for image in images]
+    attacked_images = [torch.tensor(image.to(device), requires_grad = True) for image in images]
 
     augmented_patch = patch if augmentations is None else augmentations(patch)
 
