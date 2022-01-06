@@ -64,6 +64,8 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
 
     costs = loss(predict, patch, device)
 
+    print(len(attacked_images), attacked_images[0].shape)
+
     grad = torch.autograd.grad(outputs=sum(sum(sum(sum(attacked_images)))), inputs=patch, retain_graph=True, create_graph=True, allow_unused=True)[0]
 
     patch = patch.detach()
