@@ -52,21 +52,24 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
 
     patch.requires_grad = True
 
-    attacked_images = [torch.tensor(image.to(device), requires_grad = True) for image in images]
+    attacked_images = [] #torch.tensor(image.to(device), requires_grad = True) for image in images
 
     augmented_patch = patch if augmentations is None else augmentations(patch)
 
-    for i, attacked_image in enumerate(attacked_images):
-        for label in labels[i-1]:
-            attacked_image = insert_patch(attacked_image, augmented_patch, label, 0.3, device)
+    for i, image in enumerate(images):
+        if labels[i][2] * labels[i][3] != 0:
+            attacked_image = image.to(device)
+
+            for label in labels[i]:
+                attacked_image = insert_patch(attacked_image, augmented_patch, label, 0.3, device)
+
+            attacked_images.append(attacked_image)
 
     predict = model(attacked_images)
 
     costs = loss(predict, patch, device)
 
-    grad = sum(costs).backward()
-
-    #grad = torch.autograd.grad(outputs=sum(sum(sum(sum(attacked_images)))), inputs=patch, retain_graph=True, create_graph=True, allow_unused=True)[0]
+    grad = torch.autograd.grad(outputs=sum(sum(sum(sum(attacked_images)))), inputs=patch, retain_graph=True, create_graph=True, allow_unused=True)[0]
 
     patch = patch.detach()
 
