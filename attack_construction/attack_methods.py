@@ -65,6 +65,8 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
 
             attacked_images.append(attacked_image)
 
+    print(len(attacked_images))
+
     predict = model(attacked_images)
 
     costs = loss(predict, patch, device)
