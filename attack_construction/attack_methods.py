@@ -79,8 +79,6 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
 
     patch = patch.detach()
 
-    print(grad)
-
     return costMean, patch
 
 
