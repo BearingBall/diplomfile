@@ -64,21 +64,20 @@ def main():
 
     small_val_loader = torch.utils.data.DataLoader(
         dataset=torch.utils.data.Subset(dataset_val, range(0, int(len(dataset_val) * val_pecentage))),
-        batch_size=batch_size,
+        batch_size=30,
         shuffle=False,
         num_workers=10
     )
 
     val_loader = torch.utils.data.DataLoader(
         dataset=torch.utils.data.Subset(dataset_val, range(0, int(len(dataset_val) * val_pecentage))),
-        batch_size=batch_size,
+        batch_size=30,
         shuffle=True,
         num_workers=10
     )
 
     patch = attack_methods.generate_random_patch()
     patch = patch.to(device)
-    patch.requires_grad = True
 
     augmentations = torchvision.transforms.Compose([
         torchvision.transforms.ColorJitter(brightness=0.4, contrast=0.2, saturation=0.2, hue=0.05),
