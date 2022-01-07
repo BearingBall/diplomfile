@@ -57,7 +57,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
     augmented_patch = patch if augmentations is None else augmentations(patch)
 
     for i, image in enumerate(images):
-        if labels[i][2] * labels[i][3] != 0:
+        if labels[i][0][2] * labels[i][0][3] != 0:
             attacked_image = image.to(device)
 
             for label in labels[i]:
