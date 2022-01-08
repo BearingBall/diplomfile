@@ -133,7 +133,7 @@ def validate(
         if example_batch_num == val_idx and example_file is not None:
             for j, (image) in enumerate(images):
                 cv.imwrite((example_file / (str(j) + "_gt.png")).as_posix(), cv.cvtColor(visualize_labels_gt(data_utils.tensor_to_image(image), labels[j]), cv.COLOR_RGB2BGR))
-                cv.imwrite((example_file / (str(j) + "_predicted.png")).as_posix(), cv.cvtColor(visualize_labels_predicted(data_utils.tensor_to_image(image), predict[j], 0.5), cv.COLOR_RGB2BGR))
+                cv.imwrite((example_file / (str(j) + "_predicted.png")).as_posix(), cv.cvtColor(visualize_labels_predicted(data_utils.tensor_to_image(attacked_images[j]), predict[j], 0.2), cv.COLOR_RGB2BGR))
 
     with open("tmp.json", 'w') as f_after:
         json.dump(annotation_after, f_after)
