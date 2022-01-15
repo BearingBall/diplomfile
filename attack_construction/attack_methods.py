@@ -73,7 +73,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
         grad = torch.autograd.grad(outputs=sum(costs), inputs=patch, retain_graph=True, create_graph=True, allow_unused=True)[0]
         
         if grad is not None:
-            patch = patch - grad_rate * grad.sign()
+            patch = torch.clamp(patch - grad_rate * grad.sign(), 0, 1)
 
         costMean = np.mean(np.asarray([cost.detach().cpu().numpy() for cost in costs]))
 
