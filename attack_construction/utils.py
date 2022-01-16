@@ -26,7 +26,7 @@ def save_patch_tensor(tensor, path, epoch=None, step=None, save_mode='both'):
 
     if save_mode == 'img' or save_mode == 'both':
         img_path = 'patch.png' if epoch is None else f'patch_{epoch}_{step}.png'
-        cv2.imwrite((image_folder / img_path).as_posix(), data_utils.tensor_to_image(tensor))
+        cv2.imwrite((image_folder / img_path).as_posix(), cv2.cvtColor(data_utils.tensor_to_image(tensor), cv2.COLOR_RGB2BGR))
 
 
 def load_tensor_from_pickle(path_to_pickle):
