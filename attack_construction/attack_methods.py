@@ -107,7 +107,7 @@ def validate(
         if augmented_patch is not None:
             for i, _ in enumerate(images):
                 for label in labels[i]:
-                    attacked_images[i] = insert_patch(attacked_images[i], augmented_patch, label, random.uniform(0.1, 0.4), device)
+                    attacked_images[i] = insert_patch(attacked_images[i], augmented_patch, label, 0.3, device)
 
         with torch.no_grad():
             predict = model(attacked_images)
