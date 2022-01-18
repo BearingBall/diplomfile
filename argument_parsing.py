@@ -125,3 +125,28 @@ def parse_command_line_args_filter():
         default=1,
     )
     return parser.parse_args()
+
+def parse_command_line_args_validate():
+    parser = argparse.ArgumentParser(description='Validate patch')
+    parser.add_argument(
+        '--patch',
+        help='patch (png) path',
+        required=False,
+        type=str,
+        default='patch.png',
+    )
+    parser.add_argument(
+        '--val_data',
+        help='validation folder path',
+        required=False,
+        type=str,
+        default='../val2017/val2017',
+    )
+    parser.add_argument(
+        '--val_labels',
+        help='validation labels file path',
+        required=False,
+        type=str,
+        default='../annotations_trainval2017/annotations/instances_val2017.json',
+    )
+    return parser.parse_args()
