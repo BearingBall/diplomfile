@@ -28,7 +28,7 @@ def generate_random_patch(resolution=(70, 70)):
 
 
 def insert_patch(image, patch, box, ratio, device, random_place=False):
-    patch_size = (int(box[3] / 3 * ratio), int(box[2] * ratio))
+    patch_size = (int(box[3] * ratio), int(box[2] * ratio))
 
     # cant insert patch with this box parameters
     if patch_size[0] == 0 or patch_size[1] == 0:
