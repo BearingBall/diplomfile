@@ -62,7 +62,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
             attacked_image = image.to(device)
 
             for label in labels[i]:
-                attacked_image = insert_patch(attacked_image, augmented_patch, label, random.uniform(0.25, 0.45), device)
+                attacked_image = insert_patch(attacked_image, augmented_patch, label, random.uniform(0.25, 0.45), device, True)
 
             attacked_images.append(attacked_image)
 
@@ -107,7 +107,7 @@ def validate(
         if augmented_patch is not None:
             for i, _ in enumerate(images):
                 for label in labels[i]:
-                    attacked_images[i] = insert_patch(attacked_images[i], augmented_patch, label, random.uniform(0.25, 0.45), device)
+                    attacked_images[i] = insert_patch(attacked_images[i], augmented_patch, label, random.uniform(0.25, 0.45), device, True)
 
         with torch.no_grad():
             predict = model(attacked_images)
