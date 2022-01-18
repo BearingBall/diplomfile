@@ -32,7 +32,7 @@ def main():
     val_images = args.val_data
     train_labels = args.train_labels
     val_labels = args.val_labels
-    device = torch.device("cpu") if int(args.device) == 0 else torch.device("cuda:0")
+    device = torch.device("cpu") if int(args.device) == 0 else torch.device("cuda:1")
     batch_size = args.batch_size
     grad_rate = args.rate
     epoches = args.epochs
