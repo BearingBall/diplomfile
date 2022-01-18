@@ -148,5 +148,9 @@ def validate(
     cocoEval.accumulate()
     cocoEval.summarize()
 
-    total_variation = attack_metric.total_variation(patch).detach().cpu()
+    total_variation = 0
+
+    if patch is not None:
+        total_variation = attack_metric.total_variation(patch).detach().cpu()
+        
     return np.mean(np.asarray(objectness)), total_variation, np.mean(cocoEval.stats)
