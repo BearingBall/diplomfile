@@ -28,7 +28,7 @@ def generate_random_patch(resolution=(70, 70)):
 
 
 def insert_patch(image, patch, box, ratio, device, random_place=False):
-    patch_size = (int(box[3] * ratio), int(box[2] * ratio))
+    patch_size = (int(box[3] / 3 * ratio), int(box[2] * ratio))
 
     # cant insert patch with this box parameters
     if patch_size[0] == 0 or patch_size[1] == 0:
@@ -37,7 +37,7 @@ def insert_patch(image, patch, box, ratio, device, random_place=False):
     resized_patch = T.Resize(size=patch_size, interpolation=T.InterpolationMode.BICUBIC)(patch)
 
     patch_x_offset = box[2] * (random.uniform(0, 1 - ratio) if random_place else 0.5 - ratio / 2)
-    patch_y_offset = box[3] * (random.uniform(0, 1 - ratio) if random_place else 0.5 - ratio / 2)
+    patch_y_offset = box[3] * (random.uniform(0.5, 1 - ratio) if random_place else 0.5 - ratio / 2)
     x_shift = int(box[0] + patch_x_offset)
     y_shift = int(box[1] + patch_y_offset)
 
@@ -62,7 +62,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
             attacked_image = image.to(device)
 
             for label in labels[i]:
-                attacked_image = insert_patch(attacked_image, augmented_patch, label, random.uniform(0.1, 0.4), device)
+                attacked_image = insert_patch(attacked_image, augmented_patch, label, random.uniform(0.25, 0.45), device)
 
             attacked_images.append(attacked_image)
 
@@ -107,7 +107,7 @@ def validate(
         if augmented_patch is not None:
             for i, _ in enumerate(images):
                 for label in labels[i]:
-                    attacked_images[i] = insert_patch(attacked_images[i], augmented_patch, label, 0.3, device)
+                    attacked_images[i] = insert_patch(attacked_images[i], augmented_patch, label, random.uniform(0.25, 0.45), device)
 
         with torch.no_grad():
             predict = model(attacked_images)
