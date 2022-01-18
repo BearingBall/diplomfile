@@ -45,8 +45,16 @@ def main():
         num_workers=10
     )
 
-    patch = load_tensor_from_image(patch_file)
-    patch = patch.to(device)
+    try:
+        patch = load_tensor_from_image(patch_file)
+        patch = patch.to(device)
+    except Exception:
+        patch = None
+
+    if patch is None:
+        print('Patch None')
+    else:
+        print('Patch found')
 
     obj, tv, mAP = attack_methods.validate(
         model, 
