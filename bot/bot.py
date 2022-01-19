@@ -85,7 +85,7 @@ def operate_image(image):
                     int(predict['boxes'][i][2] - predict['boxes'][i][0]),
                     int(predict['boxes'][i][3] - predict['boxes'][i][1])]
             
-            image_attacked = attack.insert_patch(image_attacked, patch, box, 0.3, device, False)
+            image_attacked = attack.insert_patch(image_attacked, patch, box, 0.3, device, True)
 
 
     with torch.no_grad():
