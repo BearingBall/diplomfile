@@ -91,6 +91,7 @@ def main():
 
     for epoch in range(epoches):
         image_counter = 0
+        prev_steps = epoch * len(train_loader)
         for step_num, (images, labels, _, _) in enumerate(train_loader):
             image_counter += batch_size
             loss, patch = attack_methods.training_step(
@@ -105,7 +106,7 @@ def main():
             )
             # TODO: apply tqdm library for progress logging
             print(f"ep:{epoch}, epoch_progress:{image_counter/len(dataset)}, batch_loss:{loss}")
-            writer.add_scalar('Loss/train', loss, step_num)
+            writer.add_scalar('Loss/train', loss, step_num + prev_steps)
 
             if step_num % step_save_frequency == 0:
                 save_patch_tensor(patch, experiment_dir, epoch=epoch, step=step_num, save_mode='both')
@@ -120,9 +121,9 @@ def main():
                     val_labels, 
                     validate_dir)
                 print(f'patch saved. VAL: objectness:{obj}, attacked:{tv}, mAP:{mAP}')
-                writer.add_scalar('Loss/val_obj', obj, step_num)
-                writer.add_scalar('Loss/val_tv', tv, step_num)
-                writer.add_scalar('mAP/val', mAP, step_num)
+                writer.add_scalar('Loss/val_obj', obj, step_num + prev_steps)
+                writer.add_scalar('Loss/val_tv', tv, step_num + prev_steps)
+                writer.add_scalar('mAP/val', mAP, step_num + prev_steps)
                 writer.flush()
 
         # at least one time in epoch you need full validation

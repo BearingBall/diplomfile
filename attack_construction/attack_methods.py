@@ -23,7 +23,7 @@ def adversarial_loss_function(predict, patch, device, tv_scale):
     return metrics.general_objectness(predict, device) + tv_scale * metrics.total_variation(patch)
 
 
-def generate_random_patch(resolution=(70, 70)):
+def generate_random_patch(resolution=(200, 200)):
     return torch.rand(3, resolution[0], resolution[1])
 
 
@@ -62,7 +62,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
             attacked_image = image.to(device)
 
             for label in labels[i]:
-                attacked_image = insert_patch(attacked_image, augmented_patch, label, 0.4, device, True)
+                attacked_image = insert_patch(attacked_image, augmented_patch, label, 0.3, device, True)
 
             attacked_images.append(attacked_image)
 
@@ -107,7 +107,7 @@ def validate(
         if augmented_patch is not None:
             for i, _ in enumerate(images):
                 for label in labels[i]:
-                    attacked_images[i] = insert_patch(attacked_images[i], augmented_patch, label, 0.4, device, True)
+                    attacked_images[i] = insert_patch(attacked_images[i], augmented_patch, label, 0.3, device, True)
 
         with torch.no_grad():
             predict = model(attacked_images)
