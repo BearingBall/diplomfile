@@ -55,7 +55,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
 
     attacked_images = [] #torch.tensor(image.to(device), requires_grad = True) for image in images
 
-    #augmented_patch = patch if augmentations is None else augmentations(patch)
+    augmented_patch = patch if augmentations is None else augmentations(patch)
     '''
     for i, image in enumerate(images):
         if labels[i][0][2] * labels[i][0][3] != 0:
