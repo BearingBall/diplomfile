@@ -78,7 +78,7 @@ def main():
 
     patch = attack_methods.generate_random_patch()
     patch = patch.to(device)
-    patch.require_grad = True
+    patch.requires_grad = True
 
     optimizer = torch.optim.Adam([patch], lr=grad_rate, amsgrad=True)
 
