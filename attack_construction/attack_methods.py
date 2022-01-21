@@ -64,7 +64,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
             for label in labels[i]:
                 attacked_image = insert_patch(attacked_image, augmented_patch, label, 0.4, device, True)
 
-            attacked_images.append(attacked_image)
+            #attacked_images.append(attacked_image)
     
     costMean = 0
 
@@ -86,9 +86,6 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
         patch = torch.clamp(patch, 0, 1)
 
         #costMean = np.mean(np.asarray([cost.detach().cpu().numpy() for cost in costs]))
-
-    for attacked_image in attacked_images:
-        attacked_image = attacked_image.detach()
 
     optimizer.zero_grad()
 
