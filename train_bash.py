@@ -108,7 +108,7 @@ def main():
                 optimizer=optimizer,
             )
             # TODO: apply tqdm library for progress logging
-            print(f"ep:{epoch}, epoch_progress:{image_counter/len(dataset)}, batch_loss:{loss}")
+            print(f"ep:{epoch}, epoch_progress:{image_counter/len(dataset)}, batch_loss:{loss}, patch sum :{sum(sum(sum(patch)))}")
             writer.add_scalar('Loss/train', loss, step_num + prev_steps)
 
             if step_num % step_save_frequency == 0:
