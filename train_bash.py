@@ -78,6 +78,9 @@ def main():
 
     patch = attack_methods.generate_random_patch()
     patch = patch.to(device)
+    patch.require_grad = True
+
+    optimizer = torch.optim.Adam([patch], lr=grad_rate, amsgrad=True)
 
     augmentations = torchvision.transforms.Compose([
         torchvision.transforms.ColorJitter(brightness=0.4, contrast=0.2, saturation=0.2, hue=0.05),
@@ -102,7 +105,7 @@ def main():
                 labels=labels,
                 loss=loss_function,
                 device=device,
-                grad_rate=grad_rate,
+                optimizer=optimizer,
             )
             # TODO: apply tqdm library for progress logging
             print(f"ep:{epoch}, epoch_progress:{image_counter/len(dataset)}, batch_loss:{loss}")
