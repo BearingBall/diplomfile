@@ -78,7 +78,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
         #if grad is not None:
         #    patch = torch.clamp(patch - grad_rate * grad.sign(), 0, 1)
 
-        cost.backward()
+        cost.backward(retain_graph=True)
         optimizer.step()
 
         patch = torch.clamp(patch, 0, 1)
