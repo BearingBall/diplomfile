@@ -49,6 +49,7 @@ def insert_patch(image, patch, box, ratio, device, random_place=False):
 
 
 def training_step(model, patch, augmentations, images, labels, loss, device, optimizer):
+    torch.autograd.set_detect_anomaly(True)
     #torch.cuda.empty_cache()
     optimizer.zero_grad()
 
