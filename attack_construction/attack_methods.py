@@ -87,6 +87,9 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
 
         #costMean = np.mean(np.asarray([cost.detach().cpu().numpy() for cost in costs]))
 
+    for attacked_image in attacked_images:
+        attacked_image = attacked_image.detach()
+
     optimizer.zero_grad()
 
     return costMean, patch
