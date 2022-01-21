@@ -80,8 +80,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
         cost.backward()
         optimizer.step()
 
-        with torch.no_grad():
-            patch = torch.clamp(patch, 0, 1)
+        patch = torch.clamp(patch, 0, 1)
 
         optimizer.zero_grad()
 
