@@ -70,9 +70,9 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
 
     if len(attacked_images) != 0:
 
-        predict = model(attacked_images)
+        #predict = model(attacked_images)
 
-        costs = loss(predict, patch, device)
+        #costs = loss(predict, patch, device)
         #cost = sum(costs)
         cost = sum(sum(sum(patch)))
         #grad = torch.autograd.grad(outputs=sum(costs), inputs=patch, retain_graph=True, create_graph=True, allow_unused=True)[0]
