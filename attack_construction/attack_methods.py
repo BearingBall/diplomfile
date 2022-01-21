@@ -48,48 +48,41 @@ def insert_patch(image, patch, box, ratio, device, random_place=False):
     return result
 
 
-def training_step(model, patch, augmentations, images, labels, loss, device, optimizer):
-    torch.autograd.set_detect_anomaly(True)
-    #torch.cuda.empty_cache()
-    optimizer.zero_grad()
+def training_step(model, patch, augmentations, images, labels, loss, device, grad_rate):
+    torch.cuda.empty_cache()
+
+    patch.requires_grad = True
 
     attacked_images = [] #torch.tensor(image.to(device), requires_grad = True) for image in images
 
     augmented_patch = patch if augmentations is None else augmentations(patch)
-    
+
     for i, image in enumerate(images):
         if labels[i][0][2] * labels[i][0][3] != 0:
-            attacked_image = image.clone().to(device)
+            attacked_image = image.to(device)
 
             for label in labels[i]:
                 attacked_image = insert_patch(attacked_image, augmented_patch, label, 0.4, device, True)
 
-            #attacked_images.append(attacked_image)
-    
+            attacked_images.append(attacked_image)
+
     costMean = 0
 
     if len(attacked_images) != 0:
 
-        #predict = model(attacked_images)
+        predict = model(attacked_images)
 
-        #costs = loss(predict, patch, device)
-        #cost = sum(costs)
-        cost = sum(sum(sum(patch)))
-        #grad = torch.autograd.grad(outputs=sum(costs), inputs=patch, retain_graph=True, create_graph=True, allow_unused=True)[0]
+        costs = loss(predict, patch, device)
+        grad = torch.autograd.grad(outputs=sum(costs), inputs=patch, retain_graph=True, create_graph=True, allow_unused=True)[0]
         
-        #if grad is not None:
-        #    patch = torch.clamp(patch - grad_rate * grad.sign(), 0, 1)
+        if grad is not None:
+            patch = torch.clamp(patch - grad_rate * grad.sign(), 0, 1)
 
-        cost.backward()
-        optimizer.step()
 
-        patch = torch.clamp(patch, 0, 1)
+        costMean = np.mean(np.asarray([cost.detach().cpu().numpy() for cost in costs]))
 
-        #costMean = np.mean(np.asarray([cost.detach().cpu().numpy() for cost in costs]))
 
-    attacked_images.clear()
-    optimizer.zero_grad()
-
+    patch = patch.detach() 
     return costMean, patch
 
 

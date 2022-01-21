@@ -78,7 +78,6 @@ def main():
 
     patch = attack_methods.generate_random_patch()
     patch = patch.to(device)
-    patch.requires_grad = True
 
     optimizer = torch.optim.Adam([patch], lr=grad_rate, amsgrad=True)
 
@@ -105,7 +104,7 @@ def main():
                 labels=labels,
                 loss=loss_function,
                 device=device,
-                optimizer=optimizer,
+                grad_rate=grad_rate,
             )
             # TODO: apply tqdm library for progress logging
             print(f"ep:{epoch}, epoch_progress:{image_counter/len(dataset)}, batch_loss:{loss}, patch sum :{sum(sum(sum(patch)))}")
