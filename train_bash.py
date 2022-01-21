@@ -111,7 +111,7 @@ def main():
             print(f"ep:{epoch}, epoch_progress:{image_counter/len(dataset)}, batch_loss:{loss}, patch sum :{sum(sum(sum(patch)))}")
             writer.add_scalar('Loss/train', loss, step_num + prev_steps)
 
-            if step_num % step_save_frequency == 0:
+            if step_num % step_save_frequency == 10:
                 save_patch_tensor(patch, experiment_dir, epoch=epoch, step=step_num, save_mode='both')
                 validate_dir = experiment_dir / ('validate_epoch_' + str(epoch) + '_step_' + str(step_num))
                 validate_dir.mkdir(parents=True, exist_ok=True)

@@ -79,9 +79,11 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
 
         cost.backward()
         optimizer.step()
-        optimizer.zero_grad()
 
-        patch = torch.clamp(patch, 0, 1)
+        with torch.no_grad():
+            patch = torch.clamp(patch, 0, 1)
+
+        optimizer.zero_grad()
 
         #costMean = np.mean(np.asarray([cost.data[0].numpy() for cost in costs]))
 
