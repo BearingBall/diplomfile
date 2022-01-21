@@ -50,6 +50,7 @@ def insert_patch(image, patch, box, ratio, device, random_place=False):
 
 def training_step(model, patch, augmentations, images, labels, loss, device, optimizer):
     #torch.cuda.empty_cache()
+    optimizer.zero_grad()
 
     attacked_images = [] #torch.tensor(image.to(device), requires_grad = True) for image in images
 
@@ -84,7 +85,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
 
         optimizer.zero_grad()
 
-        #costMean = np.mean(np.asarray([cost.data[0].numpy() for cost in costs]))
+        costMean = np.mean(np.asarray([cost.detach().cpu().numpy() for cost in costs]))
 
     return costMean, patch
 
