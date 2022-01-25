@@ -49,6 +49,7 @@ def insert_patch(image, patch, box, ratio, device, random_place=False):
 
 
 def training_step(model, patch, augmentations, images, labels, loss, device, optimizer):
+    torch.cuda.empty_cache()
 
     attacked_images = [] #torch.tensor(image.to(device), requires_grad = True) for image in images
 
