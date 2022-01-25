@@ -79,6 +79,8 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
 
         patch = torch.clamp(patch, 0, 1)
 
+        print('sp:', sum(sum(sum(patch))))
+
         costMean = np.mean(np.asarray([cost.detach().cpu().numpy() for cost in costs]))
 
     return costMean, patch
