@@ -69,11 +69,11 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
 
         predict = model(attacked_images)
 
-        #costs = loss(predict, patch, device)
+        costs = loss(predict, patch, device)
 
-        #cost = sum(costs)
+        cost = sum(costs)
     
-        cost = sum(sum(sum(patch)))
+        #cost = sum(sum(sum(patch)))
         cost.backward()
 
         optimizer.step()
