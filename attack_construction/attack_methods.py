@@ -64,20 +64,20 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
             attacked_images.append(attacked_image)
 
     costMean = 0
-    ''' 
+    
     if len(attacked_images) != 0:
 
         predict = model(attacked_images)
 
-        costs = loss(predict, patch, device)
+        #costs = loss(predict, patch, device)
 
-        cost = sum(costs)
-    '''
-    cost = sum(sum(sum(patch)))
-    cost.backward()
+        #cost = sum(costs)
+    
+        cost = sum(sum(sum(patch)))
+        cost.backward()
 
-    optimizer.step()
-    optimizer.zero_grad()
+        optimizer.step()
+        optimizer.zero_grad()
 
         #costMean = np.mean(np.asarray([cost.detach().cpu().numpy() for cost in costs]))
 
