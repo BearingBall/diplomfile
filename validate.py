@@ -52,7 +52,7 @@ def main():
         patch = None
 
     if patch is None:
-        print('Patch None')
+        print('Patch = None')
     else:
         print('Patch found')
 
