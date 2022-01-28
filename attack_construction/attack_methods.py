@@ -49,7 +49,7 @@ def insert_patch(image, patch, box, ratio, device, random_place=False):
 
 
 def training_step(model, patch, augmentations, images, labels, loss, device, optimizer):
-    '''
+    
     attacked_images = [] #torch.tensor(image.to(device), requires_grad = True) for image in images
 
     augmented_patch = patch if augmentations is None else augmentations(patch)
@@ -64,7 +64,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
             attacked_images.append(attacked_image)
 
     costMean = 0
-
+'''
     if len(attacked_images) != 0:
 
         predict = model(attacked_images)
@@ -81,8 +81,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
 
         #costMean = np.mean(np.asarray([cost.detach().cpu().numpy() for cost in costs]))
 
-    #return costMean, patch
-    return 0, patch
+    return costMean, patch
 
 
 def validate(
