@@ -73,13 +73,14 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
 
         cost = sum(costs)
     
-        #cost = sum(sum(sum(patch)))
         cost.backward()
 
         optimizer.step()
         optimizer.zero_grad()
 
-        #costMean = np.mean(np.asarray([cost.detach().cpu().numpy() for cost in costs]))
+        costMean = np.mean(np.asarray([cost.detach().cpu().numpy() for cost in costs]))
+
+        print('patch: ', sum(sum(sum(patch))))
 
     return costMean, patch
 
