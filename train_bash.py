@@ -18,6 +18,7 @@ from attack_construction.utils import save_patch_tensor
 from argument_parsing import parse_command_line_args_train
 from attack_construction.attack_methods import adversarial_loss_function_batch
 from data import dataset as data
+from RAdam.radam import RAdam
 
 print(torch.__version__)
 # This line doesnt work for me
@@ -80,7 +81,7 @@ def main():
     patch = patch.to(device)
     patch.requires_grad = True
 
-    optimizer = torch.optim.Adam([patch], lr=grad_rate, amsgrad=True)
+    optimizer = RAdam.RAdam([patch], lr=grad_rate)
 
     augmentations = torchvision.transforms.Compose([
         torchvision.transforms.ColorJitter(brightness=0.4, contrast=0.2, saturation=0.2, hue=0.05),
