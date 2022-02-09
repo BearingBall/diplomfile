@@ -84,7 +84,7 @@ def main():
     optimizer = RAdam([patch], lr=grad_rate)
 
     augmentations = torchvision.transforms.Compose([
-        torchvision.transforms.ColorJitter(brightness=(-0.1, 0.1), contrast=(0.8, 1.2)),
+        torchvision.transforms.ColorJitter(brightness=(0, 0.1), contrast=(0.8, 1.2)),
         torchvision.transforms.GaussianBlur(kernel_size=(5, 5), sigma=(1.2, 1.2)),
         torchvision.transforms.RandomRotation(degrees=(-5, 5)),
     ])
