@@ -84,12 +84,10 @@ def main():
     optimizer = RAdam([patch], lr=grad_rate)
 
     augmentations = torchvision.transforms.Compose([
-        torchvision.transforms.ColorJitter(brightness=0.4, contrast=0.2, saturation=0.2, hue=0.05),
-        torchvision.transforms.GaussianBlur(kernel_size=(5, 9), sigma=(0.1, 0.2)),
+        torchvision.transforms.ColorJitter(brightness=(-0.1, 0.1), contrast=(0.8, 1.2)),
+        torchvision.transforms.GaussianBlur(kernel_size=(5, 5), sigma=(1.2, 1.2)),
         torchvision.transforms.RandomRotation(degrees=(-5, 5)),
     ])
-
-    augmentations = None
 
     loss_function = partial(adversarial_loss_function_batch, tv_scale=args.tv_scale)
 
