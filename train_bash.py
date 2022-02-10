@@ -33,7 +33,7 @@ def main():
     val_images = args.val_data
     train_labels = args.train_labels
     val_labels = args.val_labels
-    device = torch.device("cpu") if int(args.device) == 0 else torch.device("cuda:0")
+    device = torch.device("cpu") if int(args.device) == 0 else torch.device("cuda:1")
     batch_size = args.batch_size
     grad_rate = args.rate
     epoches = args.epochs
@@ -84,7 +84,7 @@ def main():
     optimizer = RAdam([patch], lr=grad_rate)
 
     augmentations = torchvision.transforms.Compose([
-        torchvision.transforms.ColorJitter(brightness=(0, 0.1), contrast=(0.8, 1.2)),
+        torchvision.transforms.ColorJitter(brightness=(0.8, 1.2), contrast=(0.8, 1.2)),
         torchvision.transforms.GaussianBlur(kernel_size=(5, 5), sigma=(1.2, 1.2)),
         torchvision.transforms.RandomRotation(degrees=(-5, 5)),
     ])
