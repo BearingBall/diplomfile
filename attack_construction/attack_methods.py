@@ -83,6 +83,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
 
     costMean = 0
 
+    cost = 0
 
     if len(input) != 0:
 
