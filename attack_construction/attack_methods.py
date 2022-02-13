@@ -72,18 +72,15 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
 
         for i in range(len(labels)):
             lbl = []
-            targets.append({
-                'boxes': [],
-                })
 
             for j in range(len(labels[i])):
                 if (labels[i][j][2] != 0 and labels[i][j][3] !=0):
                     lbl.append(labels[i][j])
 
             if (len(lbl) != 0):
-                targets[i]['boxes'] = torch.stack(lbl)
+                targets.append({'boxes': torch.stack(lbl)})
                 images.append(attacked_images[i])
-                
+
         predict = model(images, targets)
 
         print(predict)
