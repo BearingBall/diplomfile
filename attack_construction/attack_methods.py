@@ -116,7 +116,7 @@ def validate(
         annotation_file="../../annotations_trainval2017/annotations/instances_val2017.json",
         example_file=None
 ):
-    #model.eval()
+    model.eval()
     torch.cuda.empty_cache()
 
     example_batch_num = random.randint(0, len(val_loader))
