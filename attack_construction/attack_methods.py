@@ -104,7 +104,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
 
         #costMean = np.mean(np.asarray([cost.detach().cpu().numpy() for cost in costs]))
 
-    return costMean, patch
+    return cost.detach().cpu().numpy(), patch
 
 
 def validate(
