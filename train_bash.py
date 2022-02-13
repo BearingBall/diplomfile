@@ -134,6 +134,11 @@ def main():
                 writer.add_scalar('mAP/val', mAP, step_num + prev_steps)
                 writer.flush()
 
+                model.train()
+                for module in model.modules():
+                    if isinstance(module, torch.nn.BatchNorm1d) or isinstance(module, torch.nn.BatchNorm2d) or isinstance(module, torch.nn.BatchNorm3d):
+                        module.eval()
+
         # at least one time in epoch you need full validation
         save_patch_tensor(patch, experiment_dir, epoch=epoch, step=step_num)
         validate_dir = experiment_dir / ('validate_epoch_' + str(epoch) + '_step_' + str(step_num))
@@ -151,6 +156,10 @@ def main():
         writer.add_scalar('Loss/val_tv', tv, epoch)
         writer.add_scalar('mAP/val', mAP, epoch)
         writer.flush()
+        model.train()
+        for module in model.modules():
+            if isinstance(module, torch.nn.BatchNorm1d) or isinstance(module, torch.nn.BatchNorm2d) or isinstance(module, torch.nn.BatchNorm3d):
+                module.eval()
 
     writer.close()
 
