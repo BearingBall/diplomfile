@@ -86,20 +86,18 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
 
     if len(input) != 0:
 
-        print(targets[0]['boxes'].shape)
-        print(targets[0]['labels'].shape)
-
         predict = model(input, targets)
 
-        print(predict)
         #costs = loss(predict, patch, device)
 
         #cost = sum(costs)
-    
-        #cost.backward()
 
-        #optimizer.step()
-        #optimizer.zero_grad()
+        cost = predict['classification'] + predict['bbox_regression'] + 0.001 * metrics.total_variation(patch)
+
+        cost.backward()
+
+        optimizer.step()
+        optimizer.zero_grad()
 
         with torch.no_grad():
             patch.data.clamp_(0,1)
