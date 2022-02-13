@@ -72,15 +72,17 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
                 if (labels[i][j][2] != 0 and labels[i][j][3] !=0):
                     lbl.append(labels[i][j])
 
+            for l in lbl:
+                l[2] += l[0]
+                l[3] += l[1]
+
             if (len(lbl) != 0):
                 targets.append({'boxes': torch.stack(lbl)})
                 input.append(attacked_image)
 
 
     costMean = 0
-    
-    print(len(input))
-    print(len(targets))
+
 
     if len(input) != 0:
 
