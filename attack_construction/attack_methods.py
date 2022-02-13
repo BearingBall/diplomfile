@@ -65,6 +65,9 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
 
     costMean = 0
     
+    print(len(labels))
+    print(len(attacked_images))
+
     if len(attacked_images) != 0:
 
         images = []
