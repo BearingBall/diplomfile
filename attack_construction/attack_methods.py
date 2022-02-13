@@ -70,7 +70,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
 
             for j in range(len(labels[i])):
                 if (labels[i][j][2] != 0 and labels[i][j][3] !=0):
-                    lbl.append(labels[i][j])
+                    lbl.append(labels[i][j].to(device))
 
             for l in lbl:
                 l[2] += l[0]
@@ -86,7 +86,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
 
     if len(input) != 0:
 
-        predict = model(input, targets.to(device))
+        predict = model(input, targets)
 
         print(predict)
         #costs = loss(predict, patch, device)
