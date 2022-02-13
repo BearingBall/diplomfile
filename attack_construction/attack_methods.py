@@ -75,7 +75,8 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
                 })
             for j in range(len(labels[i])):
                 if (labels[i][j][2] != 0 and labels[i][j][3] !=0):
-                    targets[i]['boxes'].append(torch.tensor(labels[i][j]))
+                    targets[i]['boxes'].append(labels[i][j])
+            targets[i]['boxes'] = torch.tensor(targets[i]['boxes'])
 
         predict = model(attacked_images, targets)
 
