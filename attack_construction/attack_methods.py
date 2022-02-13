@@ -71,26 +71,20 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
         targets = []
 
         for i in range(len(labels)):
-
             lbl = []
-
             targets.append({
                 'boxes': [],
                 })
 
-            
             for j in range(len(labels[i])):
                 if (labels[i][j][2] != 0 and labels[i][j][3] !=0):
-                    targets[i]['boxes'].append(labels[i][j])
+                    lbl.append(labels[i][j])
 
-            if (len(targets[i]['boxes']) != 0):
-                targets[i]['boxes'] = torch.stack(targets[i]['boxes'])
-                else:
-                    targets[i]['boxes'] = torch.tensor()
-
-        print(targets)
-
-        predict = model(attacked_images, targets)
+            if (len(lbl) != 0):
+                targets[i]['boxes'] = torch.stack(lbl)
+                images.append(attacked_images[i])
+                
+        predict = model(images, targets)
 
         print(predict)
         #costs = loss(predict, patch, device)
