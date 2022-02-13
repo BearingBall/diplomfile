@@ -86,7 +86,8 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
 
     if len(input) != 0:
 
-        print(targets)
+        print(type(targets[0]['boxes']))
+        print(type(targets[0]['labels']))
 
         predict = model(input, targets)
 
