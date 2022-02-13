@@ -92,7 +92,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
 
         #cost = sum(costs)
 
-        cost = predict['classification'] + predict['bbox_regression'] + 0.00001 * metrics.total_variation(patch)
+        cost = predict['classification'] + predict['bbox_regression'] + 0.0001 * metrics.total_variation(patch)
 
         cost.backward()
 
