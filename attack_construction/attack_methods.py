@@ -54,6 +54,9 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
 
     augmented_patch = patch if augmentations is None else augmentations(patch)
 
+    input = []
+    targets = []
+
     for i, image in enumerate(images):
         if labels[i][0][2] * labels[i][0][3] != 0:
             attacked_image = image.to(device)
@@ -62,18 +65,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
                 attacked_image = insert_patch(attacked_image, augmented_patch, label, 0.4, device, True)
 
             attacked_images.append(attacked_image)
-
-    costMean = 0
-    
-    print(len(labels))
-    print(len(images))
-
-    if len(attacked_images) != 0:
-
-        images = []
-        targets = []
-
-        for i in range(len(labels)):
+            
             lbl = []
 
             for j in range(len(labels[i])):
@@ -82,9 +74,17 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
 
             if (len(lbl) != 0):
                 targets.append({'boxes': torch.stack(lbl)})
-                images.append(attacked_images[i])
+                input.append(attacked_image)
 
-        predict = model(images, targets)
+
+    costMean = 0
+    
+    print(len(input))
+    print(len(targets))
+
+    if len(input) != 0:
+
+        predict = model(input, targets)
 
         print(predict)
         #costs = loss(predict, patch, device)
