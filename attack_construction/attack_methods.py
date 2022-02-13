@@ -83,8 +83,6 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
 
     costMean = 0
 
-    cost = 0
-
     if len(input) != 0:
 
         predict = model(input, targets)
@@ -104,8 +102,9 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
             patch.data.clamp_(0,1)
 
         #costMean = np.mean(np.asarray([cost.detach().cpu().numpy() for cost in costs]))
+        return cost.detach().cpu().numpy(), patch
 
-    return cost.detach().cpu().numpy(), patch
+    return 0, patch
 
 
 def validate(
