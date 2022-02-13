@@ -71,7 +71,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
 
         for i in range(len(labels)):
             targets.append({
-                'boxes': [],
+                'boxes': torch.tensor([]),
                 })
             for j in range(len(labels[i])):
                 if (labels[i][j][2] != 0 and labels[i][j][3] !=0):
