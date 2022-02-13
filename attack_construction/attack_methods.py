@@ -91,7 +91,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
         #costs = loss(predict, patch, device)
 
         #cost = sum(costs)
-        print(predict)
+        #print(predict)
         cost = predict['classification'] + predict['bbox_regression'] + 0.0001 * metrics.total_variation(patch)
 
         cost.backward()
@@ -116,7 +116,7 @@ def validate(
         annotation_file="../../annotations_trainval2017/annotations/instances_val2017.json",
         example_file=None
 ):
-    model.eval()
+    #model.eval()
     torch.cuda.empty_cache()
 
     example_batch_num = random.randint(0, len(val_loader))
