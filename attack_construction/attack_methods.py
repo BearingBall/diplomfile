@@ -67,7 +67,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
     
     if len(attacked_images) != 0:
 
-        predict = model(attacked_images)
+        predict = model(attacked_images, labels)
 
         print(predict)
         #costs = loss(predict, patch, device)
