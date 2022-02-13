@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append('../')
 
 import warnings
@@ -46,7 +47,12 @@ def main():
     writer = SummaryWriter(log_dir=experiment_dir.as_posix())
 
     model = torchvision.models.detection.retinanet_resnet50_fpn(pretrained=True)
-    model.eval()
+    model.train()
+    for module in model.modules():
+        if isinstance(module, torch.nn.BatchNorm1d) or isinstance(module, torch.nn.BatchNorm2d) or isinstance(module, torch.nn.BatchNorm3d):
+            module.eval()
+
+    #model.eval()
     model = model.float().to(device)
 
     for param in model.parameters():

@@ -69,19 +69,20 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
 
         predict = model(attacked_images)
 
-        costs = loss(predict, patch, device)
+        print(predict)
+        #costs = loss(predict, patch, device)
 
-        cost = sum(costs)
+        #cost = sum(costs)
     
-        cost.backward()
+        #cost.backward()
 
-        optimizer.step()
-        optimizer.zero_grad()
+        #optimizer.step()
+        #optimizer.zero_grad()
 
         with torch.no_grad():
             patch.data.clamp_(0,1)
 
-        costMean = np.mean(np.asarray([cost.detach().cpu().numpy() for cost in costs]))
+        #costMean = np.mean(np.asarray([cost.detach().cpu().numpy() for cost in costs]))
 
     return costMean, patch
 
