@@ -77,7 +77,7 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
                 l[3] += l[1]
 
             if (len(lbl) != 0):
-                targets.append({'boxes': torch.stack(lbl), 'labels': torch.ones(len(lbl)).to(device)})
+                targets.append({'boxes': torch.stack(lbl), 'labels': torch.ones(len(lbl), dtype=torch.int64).to(device)})
                 input.append(attacked_image)
 
 
