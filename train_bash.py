@@ -46,7 +46,11 @@ def main():
     experiment_dir.mkdir(parents=True, exist_ok=True)
     writer = SummaryWriter(log_dir=experiment_dir.as_posix())
 
-    model = torchvision.models.detection.retinanet_resnet50_fpn(pretrained=True)
+    model = torchvision.models.detection.retinanet_resnet50_fpn(pretrained=True, 
+                                                                score_thresh=0,
+                                                                nms_thresh=0,
+                                                                fg_iou_thresh=0, 
+                                                                bg_iou_thresh=0)
     model.train()
     for module in model.modules():
         if isinstance(module, torch.nn.BatchNorm1d) or isinstance(module, torch.nn.BatchNorm2d) or isinstance(module, torch.nn.BatchNorm3d):
