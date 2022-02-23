@@ -12,6 +12,8 @@ build/
 develop-eggs/
 dist/
 downloads/
+runs/
+.runs/
 eggs/
 .eggs/
 lib64/
