@@ -25,7 +25,7 @@ def main():
     patch_file = args.patch
     val_images = args.val_data
     val_labels = args.val_labels
-    device = torch.device("cuda:0")
+    device = torch.device("cuda:1")
 
     # need for good experiment logging creation
 
