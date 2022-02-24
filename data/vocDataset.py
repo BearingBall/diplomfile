@@ -56,10 +56,10 @@ class vocDataset(data.Dataset):
             if object.find("name").text == "person" and labels_count < max_labels:
                 bbox = object.find("bndbox")
                 labels_package[labels_count] = torch.tensor([   
-                                                            int(bbox.find("xmin").text),
-                                                            int(bbox.find("ymin").text),
-                                                            int(bbox.find("xmax").text),
-                                                            int(bbox.find("ymax").text)
+                                                            float(bbox.find("xmin").text),
+                                                            float(bbox.find("ymin").text),
+                                                            float(bbox.find("xmax").text),
+                                                            float(bbox.find("ymax").text)
                                                             ])
                 labels_count += 1
 
@@ -80,4 +80,4 @@ class vocDataset(data.Dataset):
             image = cv2.resize(image, dsize=self.resize_param)
 
         image: np.ndarray = np.transpose(image, axes=(2, 0, 1)) / 255.
-        return torch.tensor(image.astype(np.float32)), labels_package, self.list[index], scale_factor
+        return torch.tensor(image.astype(np.float32)), labels_package, torch.tensor(index), scale_factor
