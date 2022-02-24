@@ -1,25 +1,13 @@
 import os
-from os.path import join as pjoin
-import collections
-import json
 import torch
 import numpy as np
-import scipy.misc as m
-import scipy.io as io
-import matplotlib.pyplot as plt
-import glob
 from pathlib import Path
 
-from PIL import Image
-from tqdm import tqdm
 from torch.utils import data
-from torchvision import transforms
 import xml.etree.ElementTree as ET
-import json
 import numpy as np
 import cv2 as cv2
 import torch
-from os import listdir
 
 class vocDataset(data.Dataset):
 
