@@ -33,7 +33,7 @@ def main():
     val_images = args.val_data
     train_labels = args.train_labels
     val_labels = args.val_labels
-    device = torch.device("cpu") if int(args.device) == 0 else torch.device("cuda:1")
+    device = torch.device("cpu") if int(args.device) == 0 else torch.device("cuda:0")
     batch_size = args.batch_size
     grad_rate = args.rate
     epoches = args.epochs
@@ -53,8 +53,8 @@ def main():
         param.requires_grad = False
 
     # TODO: use resize to pull picture in batch
-    dataset = data.AdversarialDataset((640, 640), train_images, train_labels)
-    dataset_val = data.AdversarialDataset((640, 640), val_images, val_labels)
+    dataset = data.MsCocoDataset((640, 640), train_images, train_labels)
+    dataset_val = data.MsCocoDataset((640, 640), val_images, val_labels)
 
     train_loader = torch.utils.data.MsCocoLoader(
         dataset=dataset, 
