@@ -11,6 +11,11 @@ import torch
 import torch.hub
 import torchvision
 import torchvision.utils
+import torch.distributed as dist
+import torch.multiprocessing as mp
+import torch.nn as nn
+import torch.optim as optim
+from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.tensorboard import SummaryWriter
 
 import attack_construction.attack_methods as attack_methods
@@ -33,7 +38,7 @@ def main():
     val_images = args.val_data
     train_labels = args.train_labels
     val_labels = args.val_labels
-    device = torch.device("cpu") if int(args.device) == 0 else torch.device("cuda:1")
+    device = torch.device("cpu") #if int(args.device) == 0 else torch.device("cuda:1")
     batch_size = args.batch_size
     grad_rate = args.rate
     epoches = args.epochs
@@ -51,6 +56,8 @@ def main():
 
     for param in model.parameters():
         param.requires_grad = False
+
+    ddp_model = DDP(model)
 
     # TODO: use resize to pull picture in batch
     dataset = data.AdversarialDataset((640, 640), train_images, train_labels)
@@ -91,6 +98,42 @@ def main():
 
     loss_function = partial(adversarial_loss_function_batch, tv_scale=args.tv_scale)
 
+    world_size = 2
+    mp.spawn(train_proccess,
+            args=(epoches, 
+                train_loader, 
+                batch_size, 
+                ddp_model, 
+                loss_function, 
+                device, 
+                optimizer, 
+                dataset, 
+                writer, 
+                step_save_frequency, 
+                experiment_dir, 
+                augmentations, 
+                small_val_loader,
+                val_labels,
+                val_loader),
+            nprocs=world_size,
+            join=True)
+
+
+def train_proccess( epoches, 
+                    train_loader, 
+                    batch_size, 
+                    model, 
+                    loss_function, 
+                    device, 
+                    optimizer, 
+                    dataset, 
+                    writer, 
+                    step_save_frequency, 
+                    experiment_dir, 
+                    augmentations, 
+                    small_val_loader,
+                    val_labels,
+                    val_loader):
     for epoch in range(epoches):
         image_counter = 0
         prev_steps = epoch * len(train_loader)
