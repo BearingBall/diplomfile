@@ -89,6 +89,8 @@ def main():
         torchvision.transforms.RandomRotation(degrees=(-5, 5)),
     ])
 
+    augmentations = None
+
     loss_function = partial(adversarial_loss_function_batch, tv_scale=args.tv_scale)
 
     for epoch in range(epoches):
