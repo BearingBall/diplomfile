@@ -23,7 +23,7 @@ def adversarial_loss_function(predict, patch, device, tv_scale):
     return metrics.general_objectness(predict, device) + tv_scale * metrics.total_variation(patch)
 
 
-def generate_random_patch(resolution=(200, 200)):
+def generate_random_patch(resolution=(90, 90)):
     return torch.rand(3, resolution[0], resolution[1])
 
 
