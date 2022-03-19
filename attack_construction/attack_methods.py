@@ -23,7 +23,7 @@ def adversarial_loss_function(predict, patch, device, tv_scale):
     return metrics.general_objectness(predict, device) + tv_scale * metrics.total_variation(patch)
 
 
-def generate_random_patch(resolution=(200, 200)):
+def generate_random_patch(resolution=(90, 90)):
     return torch.rand(3, resolution[0], resolution[1])
 
 
@@ -48,11 +48,8 @@ def insert_patch(image, patch, box, ratio, device, random_place=False):
     return result
 
 
-def training_step(model, patch, augmentations, images, labels, loss, device, grad_rate):
-    torch.cuda.empty_cache()
-
-    patch.requires_grad = True
-
+def training_step(model, patch, augmentations, images, labels, loss, device, optimizer):
+   
     attacked_images = [] #torch.tensor(image.to(device), requires_grad = True) for image in images
 
     augmented_patch = patch if augmentations is None else augmentations(patch)
@@ -67,22 +64,25 @@ def training_step(model, patch, augmentations, images, labels, loss, device, gra
             attacked_images.append(attacked_image)
 
     costMean = 0
-
+    
     if len(attacked_images) != 0:
 
         predict = model(attacked_images)
 
         costs = loss(predict, patch, device)
-        grad = torch.autograd.grad(outputs=sum(costs), inputs=patch, retain_graph=True, create_graph=True, allow_unused=True)[0]
-        
-        if grad is not None:
-            patch = torch.clamp(patch - grad_rate * grad.sign(), 0, 1)
 
+        cost = sum(costs)
+    
+        cost.backward()
+
+        optimizer.step()
+        optimizer.zero_grad()
+
+        with torch.no_grad():
+            patch.data.clamp_(0,1)
 
         costMean = np.mean(np.asarray([cost.detach().cpu().numpy() for cost in costs]))
 
-
-    patch = patch.detach() 
     return costMean, patch
 
 

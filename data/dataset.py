@@ -5,7 +5,7 @@ import torch
 from torch.utils.data import Dataset
 
 
-class AdversarialDataset(Dataset):
+class MsCocoDataset(Dataset):
     def __init__(
             self,
             resize=None,

@@ -18,6 +18,7 @@ from attack_construction.utils import save_patch_tensor
 from argument_parsing import parse_command_line_args_train
 from attack_construction.attack_methods import adversarial_loss_function_batch
 from data import dataset as data
+from RAdam.radam import RAdam
 
 print(torch.__version__)
 # This line doesnt work for me
@@ -32,7 +33,7 @@ def main():
     val_images = args.val_data
     train_labels = args.train_labels
     val_labels = args.val_labels
-    device = torch.device("cpu") if int(args.device) == 0 else torch.device("cuda:1")
+    device = torch.device("cpu") if int(args.device) == 0 else torch.device("cuda:0")
     batch_size = args.batch_size
     grad_rate = args.rate
     epoches = args.epochs
@@ -52,8 +53,8 @@ def main():
         param.requires_grad = False
 
     # TODO: use resize to pull picture in batch
-    dataset = data.AdversarialDataset((640, 640), train_images, train_labels)
-    dataset_val = data.AdversarialDataset((640, 640), val_images, val_labels)
+    dataset = data.MsCocoDataset((640, 640), train_images, train_labels)
+    dataset_val = data.MsCocoDataset((640, 640), val_images, val_labels)
 
     train_loader = torch.utils.data.DataLoader(
         dataset=dataset, 
@@ -78,12 +79,13 @@ def main():
 
     patch = attack_methods.generate_random_patch()
     patch = patch.to(device)
+    patch.requires_grad = True
 
-    optimizer = torch.optim.Adam([patch], lr=grad_rate, amsgrad=True)
+    optimizer = RAdam([patch], lr=grad_rate)
 
     augmentations = torchvision.transforms.Compose([
-        torchvision.transforms.ColorJitter(brightness=0.4, contrast=0.2, saturation=0.2, hue=0.05),
-        torchvision.transforms.GaussianBlur(kernel_size=(5, 9), sigma=(0.1, 0.2)),
+        torchvision.transforms.ColorJitter(brightness=(0.8, 1.2), contrast=(0.8, 1.2)),
+        torchvision.transforms.GaussianBlur(kernel_size=(5, 5), sigma=(1.2, 1.2)),
         torchvision.transforms.RandomRotation(degrees=(-5, 5)),
     ])
 
@@ -104,7 +106,7 @@ def main():
                 labels=labels,
                 loss=loss_function,
                 device=device,
-                grad_rate=grad_rate,
+                optimizer = optimizer,
             )
             # TODO: apply tqdm library for progress logging
             print(f"ep:{epoch}, epoch_progress:{image_counter/len(dataset)}, batch_loss:{loss}")

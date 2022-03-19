@@ -13,6 +13,7 @@ import attack_construction.attack_methods as attack_methods
 from attack_construction.utils import load_tensor_from_image
 from argument_parsing import parse_command_line_args_validate
 from data import dataset as data
+from data import vocDataset as vocDataset
 
 print(torch.__version__)
 print(torchvision.__version__)
@@ -24,7 +25,7 @@ def main():
     patch_file = args.patch
     val_images = args.val_data
     val_labels = args.val_labels
-    device = torch.device("cuda:0")
+    device = torch.device("cuda:1")
 
     # need for good experiment logging creation
 
@@ -36,8 +37,9 @@ def main():
         param.requires_grad = False
 
     # TODO: use resize to pull picture in batch
-    dataset_val = data.AdversarialDataset((640, 640), val_images, val_labels)
-
+    dataset_val = data.MsCocoDataset((640, 640), val_images, val_labels)
+    #dataset_val = vocDataset.vocDataset(root="../VOCtrainval_11-May-2012/VOCdevkit/VOC2012", resize=(640, 640))
+    
     val_loader = torch.utils.data.DataLoader(
         dataset=torch.utils.data.Subset(dataset_val, range(0, int(len(dataset_val)))),
         batch_size=30,
@@ -52,7 +54,7 @@ def main():
         patch = None
 
     if patch is None:
-        print('Patch None')
+        print('Patch = None')
     else:
         print('Patch found')
 
