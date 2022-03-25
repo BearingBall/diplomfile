@@ -1,8 +1,8 @@
 import torch.nn as nn
 import torch.nn.functional as F
+import attack_construction.utils as utils
 import attack_construction as attack
 from torch.utils.tensorboard import SummaryWriter
-import attack_construction.utils as utils
 
 
 class Attack_module(nn.Module):
