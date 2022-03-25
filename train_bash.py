@@ -13,7 +13,7 @@ import torchvision
 import torchvision.utils
 from torch.utils.tensorboard import SummaryWriter
 
-import attack_construction.attack_class as attack_class
+from attack_construction.attack_class import Attack_module
 import attack_construction.attack_methods as attack_methods
 from argument_parsing import parse_command_line_args_train
 from attack_construction.attack_methods import adversarial_loss_function_batch
@@ -98,7 +98,7 @@ def main():
 
     loss_function = partial(adversarial_loss_function_batch, tv_scale=args.tv_scale)
 
-    attack_module = attack_class.Attack_module(models, patch, device)
+    attack_module = Attack_module(models, patch, device)
 
     attack_module.train(epochs=epoches, 
                         train_loader=train_loader,
