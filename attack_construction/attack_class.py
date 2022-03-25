@@ -3,7 +3,7 @@ import torch.nn.functional as F
 import attack_construction as attack
 from torch.utils.tensorboard import SummaryWriter
 
-from attack_construction.utils import save_patch_tensor
+from utils import save_patch_tensor
 
 
 class Attack_module(nn.Module):
