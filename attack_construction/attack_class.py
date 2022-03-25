@@ -37,7 +37,6 @@ class Attack_module(nn.Module):
                     )
                     losses.append(loss)
                     self.patch = patch
-                print(losses)
                 loss = np.mean(losses)
                 
                 # TODO: apply tqdm library for progress logging
