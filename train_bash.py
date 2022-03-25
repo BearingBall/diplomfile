@@ -15,7 +15,6 @@ from torch.utils.tensorboard import SummaryWriter
 
 import attack_construction.attack_class as attack_class
 import attack_construction.attack_methods as attack_methods
-from attack_construction.utils import save_patch_tensor
 from argument_parsing import parse_command_line_args_train
 from attack_construction.attack_methods import adversarial_loss_function_batch
 from data import dataset as data

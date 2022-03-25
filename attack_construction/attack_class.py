@@ -1,8 +1,8 @@
 import torch.nn as nn
 import torch.nn.functional as F
-import attack_construction.utils as utils
 import attack_construction as attack
 from torch.utils.tensorboard import SummaryWriter
+from attack_construction.utils import save_patch_tensor
 
 
 class Attack_module(nn.Module):
@@ -71,7 +71,7 @@ class Attack_module(nn.Module):
         
 
     def log_results(self, writer, experiment_dir, epoch, step_num, prev_steps, small_val_loader, val_labels, augmentations):
-        utils.save_patch_tensor(self.patch, experiment_dir, epoch=epoch, step=step_num, save_mode='both')
+        save_patch_tensor(self.patch, experiment_dir, epoch=epoch, step=step_num, save_mode='both')
         validate_dir = experiment_dir / ('validate_epoch_' + str(epoch) + '_step_' + str(step_num))
         validate_dir.mkdir(parents=True, exist_ok=True)
         obj, tv, mAP = self.validate(
