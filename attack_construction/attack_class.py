@@ -1,4 +1,5 @@
 import torch.nn as nn
+import numpy as np
 import torch.nn.functional as F
 import attack_construction.attack_methods as attack
 from torch.utils.tensorboard import SummaryWriter
@@ -21,16 +22,22 @@ class Attack_module(nn.Module):
 
             for step_num, (images, labels, _, _) in enumerate(train_loader):
                 image_counter += batch_size
-                loss, patch = attack.training_step_multymodels(
-                    models=self.models,
-                    patch=self.patch,
-                    augmentations=augmentations,
-                    images=images,
-                    labels=labels,
-                    loss=loss_function,
-                    device=self.device,
-                    optimizer = optimizer,
-                )
+
+                losses = []
+                for model in self.models:
+                    loss, patch = attack.training_step(
+                        model=model,
+                        patch=self.patch,
+                        augmentations=augmentations,
+                        images=images,
+                        labels=labels,
+                        loss=loss_function,
+                        device=self.device,
+                        optimizer = optimizer,
+                    )
+                    losses.append(loss)
+                    self.patch = patch
+                loss = np.mean(losses)
                 
                 # TODO: apply tqdm library for progress logging
                 print(f"ep:{epoch}, epoch_progress:{step_num/len(train_loader)}, batch_loss:{loss}")
