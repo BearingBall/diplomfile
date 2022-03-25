@@ -111,13 +111,14 @@ def training_step_multymodels(models, patch, augmentations, images, labels, loss
             cost = sum(costs)
             cost.backward()
             optimizer.step()
-            optimizer.zero_grad()
 
             with torch.no_grad():
                 patch.data.clamp_(0,1)
 
             costMean.append(np.mean(np.asarray([cost.detach().cpu().numpy() for cost in costs])))
 
+        
+        optimizer.zero_grad()
     return np.mean(costMean), patch
 
 
