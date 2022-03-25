@@ -1,6 +1,6 @@
 import torch.nn as nn
 import torch.nn.functional as F
-import attack_construction as attack
+import attack_construction.attack_methods as attack
 from torch.utils.tensorboard import SummaryWriter
 from attack_construction.utils import save_patch_tensor
 
