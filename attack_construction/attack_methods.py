@@ -118,7 +118,7 @@ def training_step_multymodels(models, patch, augmentations, images, labels, loss
             costMean.append(np.mean(np.asarray([cost.detach().cpu().numpy() for cost in costs])))
 
         
-        optimizer.zero_grad()
+    optimizer.zero_grad()
     return np.mean(costMean), patch
 
 
