@@ -13,6 +13,7 @@ import torchvision
 import torchvision.utils
 from torch.utils.tensorboard import SummaryWriter
 
+import attack_construction.attack_class as attack_class
 import attack_construction.attack_methods as attack_methods
 from attack_construction.utils import save_patch_tensor
 from argument_parsing import parse_command_line_args_train
@@ -45,12 +46,17 @@ def main():
     experiment_dir.mkdir(parents=True, exist_ok=True)
     writer = SummaryWriter(log_dir=experiment_dir.as_posix())
 
-    model = torchvision.models.detection.retinanet_resnet50_fpn(pretrained=True)
-    model.eval()
-    model = model.float().to(device)
+    models = [  torchvision.models.detection.retinanet_resnet50_fpn(pretrained=True),
+                torchvision.models.detection.ssdlite320_mobilenet_v3_large(pretrained=True),
+                torchvision.models.detection.fasterrcnn_mobilenet_v3_large_fpn(pretrained=True)
+             ]
 
-    for param in model.parameters():
-        param.requires_grad = False
+    for model in models:
+        model.eval()
+        model = model.float().to(device)
+
+        for param in model.parameters():
+            param.requires_grad = False
 
     # TODO: use resize to pull picture in batch
     dataset = data.MsCocoDataset((640, 640), train_images, train_labels)
@@ -93,63 +99,19 @@ def main():
 
     loss_function = partial(adversarial_loss_function_batch, tv_scale=args.tv_scale)
 
-    for epoch in range(epoches):
-        image_counter = 0
-        prev_steps = epoch * len(train_loader)
-        for step_num, (images, labels, _, _) in enumerate(train_loader):
-            image_counter += batch_size
-            loss, patch = attack_methods.training_step(
-                model=model,
-                patch=patch,
-                augmentations=None,
-                images=images,
-                labels=labels,
-                loss=loss_function,
-                device=device,
-                optimizer = optimizer,
-            )
-            # TODO: apply tqdm library for progress logging
-            print(f"ep:{epoch}, epoch_progress:{image_counter/len(dataset)}, batch_loss:{loss}")
-            writer.add_scalar('Loss/train', loss, step_num + prev_steps)
+    attack_module = attack_class.Attack_module(models, patch, device)
 
-            if step_num % step_save_frequency == 0:
-                save_patch_tensor(patch, experiment_dir, epoch=epoch, step=step_num, save_mode='both')
-                validate_dir = experiment_dir / ('validate_epoch_' + str(epoch) + '_step_' + str(step_num))
-                validate_dir.mkdir(parents=True, exist_ok=True)
-                obj, tv, mAP = attack_methods.validate(
-                    model, 
-                    patch, 
-                    augmentations, 
-                    small_val_loader, 
-                    device, 
-                    val_labels, 
-                    validate_dir)
-                print(f'patch saved. VAL: objectness:{obj}, attacked:{tv}, mAP:{mAP}')
-                writer.add_scalar('Loss/val_obj', obj, step_num + prev_steps)
-                writer.add_scalar('Loss/val_tv', tv, step_num + prev_steps)
-                writer.add_scalar('mAP/val', mAP, step_num + prev_steps)
-                writer.flush()
-
-        # at least one time in epoch you need full validation
-        save_patch_tensor(patch, experiment_dir, epoch=epoch, step=step_num)
-        validate_dir = experiment_dir / ('validate_epoch_' + str(epoch) + '_step_' + str(step_num))
-        validate_dir.mkdir(parents=True, exist_ok=True)
-        obj, tv, mAP = attack_methods.validate(
-            model, 
-            patch, 
-            augmentations, 
-            val_loader, 
-            device, 
-            val_labels, 
-            validate_dir)
-        print(f'patch saved. VAL: objectness:{obj}, attacked:{tv}, mAP:{mAP}')
-        writer.add_scalar('Loss/val_obj', obj, epoch)
-        writer.add_scalar('Loss/val_tv', tv, epoch)
-        writer.add_scalar('mAP/val', mAP, epoch)
-        writer.flush()
-
-    writer.close()
-
+    attack_module.train(epochs=epoches, 
+                        train_loader=train_loader,
+                        batch_size=batch_size,
+                        augmentations=augmentations, 
+                        loss_function=loss_function, 
+                        optimizer=optimizer, 
+                        experiment_dir=experiment_dir, 
+                        step_save_frequency=step_save_frequency, 
+                        val_loader=val_loader, 
+                        small_val_loader=small_val_loader, 
+                        val_labels=val_labels)
 
 if __name__ == '__main__':
     main()

@@ -86,6 +86,41 @@ def training_step(model, patch, augmentations, images, labels, loss, device, opt
     return costMean, patch
 
 
+def training_step_multymodels(models, patch, augmentations, images, labels, loss, device, optimizer):
+    attacked_images = [] #torch.tensor(image.to(device), requires_grad = True) for image in images
+
+    augmented_patch = patch if augmentations is None else augmentations(patch)
+
+    for i, image in enumerate(images):
+        if labels[i][0][2] * labels[i][0][3] != 0:
+            attacked_image = image.to(device)
+
+            for label in labels[i]:
+                attacked_image = insert_patch(attacked_image, augmented_patch, label, 0.4, device, True)
+
+            attacked_images.append(attacked_image)
+
+    costMean = 0
+    
+    if len(attacked_images) != 0:
+        costMean = []
+
+        for model in models:
+            predict = model(attacked_images)
+            costs = loss(predict, patch, device)
+            cost = sum(costs)
+            cost.backward()
+            optimizer.step()
+            optimizer.zero_grad()
+
+            with torch.no_grad():
+                patch.data.clamp_(0,1)
+
+            costMean.append(np.mean(np.asarray([cost.detach().cpu().numpy() for cost in costs])))
+
+    return np.mean(costMean), patch
+
+
 def validate(
         model,
         patch,
@@ -157,106 +192,3 @@ def validate(
         total_variation = attack_metric.total_variation(patch).detach().cpu()
         
     return np.mean(np.asarray(objectness)), total_variation, np.mean(cocoEval.stats)
-
-
-
-import torch.nn as nn
-import torch.nn.functional as F
-
-class Attack_module(nn.Module):
-    def __init__(self, models, patch, augmentations, images, labels, loss, device, optimizer):
-        super().__init__()
-        self.models = models
-        self.patch = patch
-        self.augmentations = augmentations
-        self.images = images
-        self.labels = labels
-        self.loss = loss
-        self.device = device
-        self.optimizer = optimizer
-
-    def train(self):
-        image_counter = 0
-        prev_steps = epoch * len(train_loader)
-        for step_num, (images, labels, _, _) in enumerate(train_loader):
-            image_counter += batch_size
-            loss, patch = attack_methods.training_step(
-                model=model,
-                patch=patch,
-                augmentations=None,
-                images=images,
-                labels=labels,
-                loss=loss_function,
-                device=device,
-                optimizer = optimizer,
-            )
-            # TODO: apply tqdm library for progress logging
-            print(f"ep:{epoch}, epoch_progress:{image_counter/len(dataset)}, batch_loss:{loss}")
-            writer.add_scalar('Loss/train', loss, step_num + prev_steps)
-
-            if step_num % step_save_frequency == 0:
-                save_patch_tensor(patch, experiment_dir, epoch=epoch, step=step_num, save_mode='both')
-                validate_dir = experiment_dir / ('validate_epoch_' + str(epoch) + '_step_' + str(step_num))
-                validate_dir.mkdir(parents=True, exist_ok=True)
-                obj, tv, mAP = attack_methods.validate(
-                    model, 
-                    patch, 
-                    augmentations, 
-                    small_val_loader, 
-                    device, 
-                    val_labels, 
-                    validate_dir)
-                print(f'patch saved. VAL: objectness:{obj}, attacked:{tv}, mAP:{mAP}')
-                writer.add_scalar('Loss/val_obj', obj, step_num + prev_steps)
-                writer.add_scalar('Loss/val_tv', tv, step_num + prev_steps)
-                writer.add_scalar('mAP/val', mAP, step_num + prev_steps)
-                writer.flush()
-
-        # at least one time in epoch you need full validation
-        save_patch_tensor(patch, experiment_dir, epoch=epoch, step=step_num)
-        validate_dir = experiment_dir / ('validate_epoch_' + str(epoch) + '_step_' + str(step_num))
-        validate_dir.mkdir(parents=True, exist_ok=True)
-        obj, tv, mAP = attack_methods.validate(
-            model, 
-            patch, 
-            augmentations, 
-            val_loader, 
-            device, 
-            val_labels, 
-            validate_dir)
-        print(f'patch saved. VAL: objectness:{obj}, attacked:{tv}, mAP:{mAP}')
-        writer.add_scalar('Loss/val_obj', obj, epoch)
-        writer.add_scalar('Loss/val_tv', tv, epoch)
-        writer.add_scalar('mAP/val', mAP, epoch)
-        writer.flush()
-
-    writer.close()
-
-    def validate(self, validate_dir):
-        objs = 0
-        tvs = 0
-        maps = 0
-        for model in self.models:
-            obj, tv, mAP = validate(
-                model, 
-                self.patch, 
-                self.augmentations, 
-                val_loader, 
-                self.device, 
-                val_labels, 
-                validate_dir)
-            objs += obj
-            tvs += tv
-            maps += mAP
-
-        obj = objs / len(self.models)
-        tv = tvs / len(self.models)
-        mAP = maps / len(self.models)
-
-        print(f'patch saved. VAL: objectness:{obj}, attacked:{tv}, mAP:{mAP}')
-        return obj, tv, mAP
-        
-        
-
-
-        
