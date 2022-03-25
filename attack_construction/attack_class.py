@@ -23,7 +23,7 @@ class Attack_module(nn.Module):
                 image_counter += batch_size
                 loss, patch = attack.training_step_multymodels(
                     models=self.models,
-                    patch=patch,
+                    patch=self.patch,
                     augmentations=augmentations,
                     images=images,
                     labels=labels,
