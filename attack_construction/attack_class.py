@@ -37,6 +37,7 @@ class Attack_module(nn.Module):
                     )
                     losses.append(loss)
                     self.patch = patch
+                print(losses)
                 loss = np.mean(losses)
                 
                 # TODO: apply tqdm library for progress logging
@@ -44,10 +45,10 @@ class Attack_module(nn.Module):
                 writer.add_scalar('Loss/train', loss, step_num + prev_steps)
 
                 if step_num % step_save_frequency == 0:
-                    self.log_results(self, writer, experiment_dir, epoch, step_num, prev_steps, small_val_loader, val_labels, augmentations)
+                    self.log_results(writer, experiment_dir, epoch, step_num, prev_steps, small_val_loader, val_labels, augmentations)
 
             # at least one time in epoch you need full validation
-            self.log_results(self, writer, experiment_dir, epoch, step_num, prev_steps, val_loader, val_labels, augmentations)
+            self.log_results(writer, experiment_dir, epoch, step_num, prev_steps, val_loader, val_labels, augmentations)
 
         writer.close()
 
