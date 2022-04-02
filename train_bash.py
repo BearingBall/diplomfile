@@ -13,7 +13,7 @@ import torchvision
 import torchvision.utils
 from torch.utils.tensorboard import SummaryWriter
 
-from attack_construction.attack_class import Attack_module
+from attack_construction.attack_class import Attack_class
 from attack_construction.attack_class import train
 from attack_construction.attack_class import validate
 import attack_construction.attack_methods as attack_methods
@@ -101,7 +101,7 @@ def main():
 
     loss_function = partial(adversarial_loss_function_batch, tv_scale=args.tv_scale)
 
-    attack_module = Attack_module(models, patch)
+    attack_module = Attack_class(models, patch)
     #attack_module = DDP(attack_module)
 
     writer = SummaryWriter(log_dir=experiment_dir.as_posix())
