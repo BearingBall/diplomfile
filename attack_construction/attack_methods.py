@@ -27,7 +27,7 @@ def generate_random_patch(resolution=(90, 90)):
     return torch.rand(3, resolution[0], resolution[1])
 
 
-def insert_patch(image, patch, box, ratio, device, random_place=False):
+def insert_patch(image, patch, box, ratio, random_place=False):
     patch_size = (int(box[3] * ratio), int(box[2] * ratio))
 
     # cant insert patch with this box parameters
@@ -43,7 +43,7 @@ def insert_patch(image, patch, box, ratio, device, random_place=False):
 
     padding = (x_shift, y_shift, image.shape[2] - x_shift - patch_size[1], image.shape[1] - y_shift - patch_size[0])
     padded_patch = T.Pad(padding=padding)(resized_patch)
-    patch_mask = T.Pad(padding=padding)(torch.ones(size=(3, patch_size[0], patch_size[1]))).to(device)
+    patch_mask = T.Pad(padding=padding)(torch.ones(size=(3, patch_size[0], patch_size[1]))).cuda()
     result = padded_patch + (torch.ones_like(image) - patch_mask) * image
     return result
 
