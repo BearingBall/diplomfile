@@ -7,6 +7,9 @@ import attack_construction.attack_methods as attack
 from torch.utils.tensorboard import SummaryWriter
 from attack_construction.utils import save_patch_tensor
 from progress.bar import IncrementalBar
+import json
+from pycocotools.coco import COCO
+from pycocotools.cocoeval import COCOeval
 
 
 def train(my_complex_model, train_dataloader, augmentations, optimizer, writer, loss):
@@ -30,33 +33,50 @@ def train(my_complex_model, train_dataloader, augmentations, optimizer, writer, 
     bar.finish()
 
 
-def validate(predict):
+#в разработке
+def validate(my_complex_model, val_dataloader, augmentations):
     annotation_after = []
 
-    for i in range(len(predict)):
-            for j in range(len(predict[i]["labels"])):
-                annotation_after.append({
-                    'image_id': img_ids[i].item(),
-                    'category_id': predict[i]["labels"][j].item(),
-                    'bbox': [
-                        predict[i]["boxes"][j][0].item() / scale_factor[i][0].item(),
-                        predict[i]["boxes"][j][1].item() / scale_factor[i][1].item(),
-                        (predict[i]["boxes"][j][2].item() - predict[i]["boxes"][j][0].item()) / scale_factor[i][0].item(),
-                        (predict[i]["boxes"][j][3].item() - predict[i]["boxes"][j][1].item()) / scale_factor[i][1].item()
+    for val_idx, (images, labels, img_ids, scale_factor) in enumerate(val_dataloader):
+        for model_index in range(len(my_complex_model.models)):
+            with torch.no_grad():
+                prediction = my_complex_model(images, labels, model_index, augmentations)
+
+            for i in range(len(prediction)):
+                for j in range(len(prediction[i]["labels"])):
+                    annotation_after.append({
+                        'image_id': img_ids[i].item(),
+                        'category_id': prediction[i]["labels"][j].item(),
+                        'bbox': [
+                          prediction[i]["boxes"][j][0].item() / scale_factor[i][0].item(),
+                          prediction[i]["boxes"][j][1].item() / scale_factor[i][1].item(),
+                          (prediction[i]["boxes"][j][2].item() - prediction[i]["boxes"][j][0].item()) / scale_factor[i][0].item(),
+                          (prediction[i]["boxes"][j][3].item() - prediction[i]["boxes"][j][1].item()) / scale_factor[i][1].item()
                     ],
-                    "score": predict[i]['scores'][j].item()
+                    "score": prediction[i]['scores'][j].item()
                 })
+
+            with open("tmp.json", 'w') as f_after:
+                json.dump(annotation_after, f_after)
+
+            cocoGt = COCO(annotation_file)
+            cocoDt = cocoGt.loadRes("./tmp.json")
+
+            cocoEval = COCOeval(cocoGt, cocoDt, 'bbox')
+            cocoEval.params.imgIds = cocoGt.getImgIds()
+            cocoEval.evaluate()
+            cocoEval.accumulate()
+            cocoEval.summarize()
 
 
 
 
 
 class Attack_class(nn.Module):
-    def __init__(self, models, patch, device):
+    def __init__(self, models, patch):
         super().__init__()
         self.models = models
         self.patch = nn.Parameter(data=patch)
-        self.device = device
 
 
     def forward(self, images, labels, model_index, augmentations):
@@ -68,11 +88,11 @@ class Attack_class(nn.Module):
         attacked_images = []
 
         for i, image in enumerate(images):
-            attacked_image = image.to(self.device)
+            attacked_image = image.cuda()
 
             if labels[i][0][2] * labels[i][0][3] != 0:
                 for label in labels[i]:
-                    attacked_image = attack.insert_patch(attacked_image, augmented_patch, label, 0.4, device, True)
+                    attacked_image = attack.insert_patch(attacked_image, augmented_patch, label, 0.4, True)
 
             attacked_images.append(attacked_image)
 
@@ -80,6 +100,13 @@ class Attack_class(nn.Module):
             return None
 
         return self.models[model_index](attacked_images)
+
+
+
+
+
+
+
 
 
     #ниже устаревшее

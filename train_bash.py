@@ -14,6 +14,8 @@ import torchvision.utils
 from torch.utils.tensorboard import SummaryWriter
 
 from attack_construction.attack_class import Attack_module
+from attack_construction.attack_class import train
+from attack_construction.attack_class import validate
 import attack_construction.attack_methods as attack_methods
 from argument_parsing import parse_command_line_args_train
 from attack_construction.attack_methods import adversarial_loss_function_batch
@@ -33,7 +35,6 @@ def main():
     val_images = args.val_data
     train_labels = args.train_labels
     val_labels = args.val_labels
-    device = torch.device("cpu") if int(args.device) == 0 else torch.device("cuda:0")
     batch_size = args.batch_size
     grad_rate = args.rate
     epoches = args.epochs
@@ -52,7 +53,7 @@ def main():
 
     for model in models:
         model.eval()
-        model = model.float().to(device)
+        model = model.float().cuda()
 
         for param in model.parameters():
             param.requires_grad = False
@@ -82,8 +83,10 @@ def main():
         num_workers=10
     )
 
+    annotation_file="../../annotations_trainval2017/annotations/instances_val2017.json"
+
     patch = attack_methods.generate_random_patch()
-    patch = patch.to(device)
+    patch = patch.cuda()
     patch.requires_grad = True
 
     optimizer = RAdam([patch], lr=grad_rate)
@@ -98,19 +101,19 @@ def main():
 
     loss_function = partial(adversarial_loss_function_batch, tv_scale=args.tv_scale)
 
-    attack_module = Attack_module(models, patch, device)
+    attack_module = Attack_module(models, patch)
+    attack_module = DDP(attack_module)
 
-    attack_module.train(epochs=epoches, 
-                        train_loader=train_loader,
-                        batch_size=batch_size,
-                        augmentations=augmentations, 
-                        loss_function=loss_function, 
-                        optimizer=optimizer, 
-                        experiment_dir=experiment_dir, 
-                        step_save_frequency=step_save_frequency, 
-                        val_loader=val_loader, 
-                        small_val_loader=small_val_loader, 
-                        val_labels=val_labels)
+    writer = SummaryWriter(log_dir=experiment_dir.as_posix())
+
+    for epoch in range(epoches):
+        train(attack_module, train_loader, augmentations, optimizer, writer, loss_function)
+        mAPs = validate(attack_module, val_loader, augmentations, annotation_file)
+        for i, mAP in enumerate(mAPs):
+            writer.add_scalar('mAP, model: ' + str(i), mAP, epoch)
+
 
 if __name__ == '__main__':
     main()
+
+from torch.nn.parallel import DistributedDataParallel as DDP
