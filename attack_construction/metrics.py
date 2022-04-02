@@ -2,12 +2,12 @@ import numpy as np
 import torch
 
 
-def general_objectness(labels, device):  # as in InvisibleCloak
-    score = torch.tensor(0.0).to(device)
+def general_objectness(labels):  # as in InvisibleCloak
+    score = torch.tensor(0.0).cuda()
     for i in range(len(labels["labels"])):
         # and labels["scores"][i] > 0.6
         if labels["labels"][i] == 1:
-            score += max(labels["scores"][i] + torch.tensor(1.0).to(device), torch.tensor(0.0).to(device))**2
+            score += max(labels["scores"][i] + torch.tensor(1.0).cuda(), torch.tensor(0.0).cuda())**2
     return score
 
 

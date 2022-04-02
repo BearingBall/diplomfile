@@ -18,7 +18,7 @@ def train(my_complex_model, train_dataloader, augmentations, optimizer, writer, 
     for step_num, (images, labels, _, _) in enumerate(train_dataloader):
         for model_index in range(len(my_complex_model.models)):
             prediction = my_complex_model(images, labels, model_index, augmentations)
-            costs = loss(prediction, my_complex_model.patch, my_complex_model.device)
+            costs = loss(prediction, my_complex_model.patch)
             cost = sum(costs)
             cost.backward()
         

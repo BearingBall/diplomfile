@@ -15,12 +15,12 @@ import data.utils as data_utils
 import attack_construction.metrics as metrics
 
 
-def adversarial_loss_function_batch(predicts, patch, device, tv_scale):
-    return [adversarial_loss_function(predict, patch, device, tv_scale) for predict in predicts]
+def adversarial_loss_function_batch(predicts, patch, tv_scale):
+    return [adversarial_loss_function(predict, patch, tv_scale) for predict in predicts]
 
 
-def adversarial_loss_function(predict, patch, device, tv_scale):
-    return metrics.general_objectness(predict, device) + tv_scale * metrics.total_variation(patch)
+def adversarial_loss_function(predict, patch,tv_scale):
+    return metrics.general_objectness(predict) + tv_scale * metrics.total_variation(patch)
 
 
 def generate_random_patch(resolution=(90, 90)):
