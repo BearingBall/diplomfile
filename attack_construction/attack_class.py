@@ -1,4 +1,4 @@
-from turtle import forward
+#from turtle import forward
 import torch
 import torch.nn as nn
 import numpy as np
@@ -34,11 +34,13 @@ def train(my_complex_model, train_dataloader, augmentations, optimizer, writer, 
 
 
 #в разработке
-def validate(my_complex_model, val_dataloader, augmentations):
-    annotation_after = []
+def validate(my_complex_model, val_dataloader, augmentations, annotation_file):
+    mAPs = []
 
-    for val_idx, (images, labels, img_ids, scale_factor) in enumerate(val_dataloader):
-        for model_index in range(len(my_complex_model.models)):
+    for model_index in range(len(my_complex_model.models)):
+        annotation_after = []
+
+        for val_idx, (images, labels, img_ids, scale_factor) in enumerate(val_dataloader):
             with torch.no_grad():
                 prediction = my_complex_model(images, labels, model_index, augmentations)
 
@@ -56,18 +58,21 @@ def validate(my_complex_model, val_dataloader, augmentations):
                     "score": prediction[i]['scores'][j].item()
                 })
 
-            with open("tmp.json", 'w') as f_after:
-                json.dump(annotation_after, f_after)
+        with open("tmp.json", 'w') as f_after:
+            json.dump(annotation_after, f_after)
 
-            cocoGt = COCO(annotation_file)
-            cocoDt = cocoGt.loadRes("./tmp.json")
+        cocoGt = COCO(annotation_file)
+        cocoDt = cocoGt.loadRes("./tmp.json")
 
-            cocoEval = COCOeval(cocoGt, cocoDt, 'bbox')
-            cocoEval.params.imgIds = cocoGt.getImgIds()
-            cocoEval.evaluate()
-            cocoEval.accumulate()
-            cocoEval.summarize()
+        cocoEval = COCOeval(cocoGt, cocoDt, 'bbox')
+        cocoEval.params.imgIds = cocoGt.getImgIds()
+        cocoEval.evaluate()
+        cocoEval.accumulate()
+        cocoEval.summarize()
 
+        mAPs.append(np.mean(cocoEval.stats))
+    
+    return mAPs 
 
 
 
@@ -110,7 +115,7 @@ class Attack_class(nn.Module):
 
 
     #ниже устаревшее
-
+'''
     def train(self, epochs, train_loader, batch_size, augmentations, loss_function, optimizer, experiment_dir, step_save_frequency, val_loader, small_val_loader, val_labels):
         writer = SummaryWriter(log_dir=experiment_dir.as_posix())
         for epoch in range(epochs):
@@ -190,5 +195,5 @@ class Attack_class(nn.Module):
         writer.flush()
 
 
-
+'''
         
