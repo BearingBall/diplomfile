@@ -1,18 +1,88 @@
+from turtle import forward
+import torch
 import torch.nn as nn
 import numpy as np
 import torch.nn.functional as F
 import attack_construction.attack_methods as attack
 from torch.utils.tensorboard import SummaryWriter
 from attack_construction.utils import save_patch_tensor
+from progress.bar import IncrementalBar
 
 
-class Attack_module(nn.Module):
+def train(my_complex_model, train_dataloader, augmentations, optimizer, writer, loss):
+    bar = IncrementalBar('Epoch progress', max = len(train_dataloader))
+
+    for step_num, (images, labels, _, _) in enumerate(train_dataloader):
+        for model_index in range(len(my_complex_model.models)):
+            prediction = my_complex_model(images, labels, model_index, augmentations)
+            costs = loss(prediction, my_complex_model.patch, my_complex_model.device)
+            cost = sum(costs)
+            cost.backward()
+        
+        optimizer.step()
+        optimizer.zero_grad()
+
+        with torch.no_grad():
+            my_complex_model.patch.data.clamp_(0,1)
+
+        bar.next()
+    
+    bar.finish()
+
+
+def validate(predict):
+    annotation_after = []
+
+    for i in range(len(predict)):
+            for j in range(len(predict[i]["labels"])):
+                annotation_after.append({
+                    'image_id': img_ids[i].item(),
+                    'category_id': predict[i]["labels"][j].item(),
+                    'bbox': [
+                        predict[i]["boxes"][j][0].item() / scale_factor[i][0].item(),
+                        predict[i]["boxes"][j][1].item() / scale_factor[i][1].item(),
+                        (predict[i]["boxes"][j][2].item() - predict[i]["boxes"][j][0].item()) / scale_factor[i][0].item(),
+                        (predict[i]["boxes"][j][3].item() - predict[i]["boxes"][j][1].item()) / scale_factor[i][1].item()
+                    ],
+                    "score": predict[i]['scores'][j].item()
+                })
+
+
+
+
+
+class Attack_class(nn.Module):
     def __init__(self, models, patch, device):
         super().__init__()
         self.models = models
-        self.patch = patch
+        self.patch = nn.Parameter(data=patch)
         self.device = device
 
+
+    def forward(self, images, labels, model_index, augmentations):
+        if (model_index >= len(self.models)):
+            return None
+
+        augmented_patch = self.patch if augmentations is None else augmentations(self.patch)
+
+        attacked_images = []
+
+        for i, image in enumerate(images):
+            attacked_image = image.to(self.device)
+
+            if labels[i][0][2] * labels[i][0][3] != 0:
+                for label in labels[i]:
+                    attacked_image = attack.insert_patch(attacked_image, augmented_patch, label, 0.4, device, True)
+
+            attacked_images.append(attacked_image)
+
+        if (len(attacked_images) == 0):
+            return None
+
+        return self.models[model_index](attacked_images)
+
+
+    #ниже устаревшее
 
     def train(self, epochs, train_loader, batch_size, augmentations, loss_function, optimizer, experiment_dir, step_save_frequency, val_loader, small_val_loader, val_labels):
         writer = SummaryWriter(log_dir=experiment_dir.as_posix())
