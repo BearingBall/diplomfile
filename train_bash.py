@@ -102,7 +102,7 @@ def main():
     loss_function = partial(adversarial_loss_function_batch, tv_scale=args.tv_scale)
 
     attack_module = Attack_module(models, patch)
-    attack_module = DDP(attack_module)
+    #attack_module = DDP(attack_module)
 
     writer = SummaryWriter(log_dir=experiment_dir.as_posix())
 
