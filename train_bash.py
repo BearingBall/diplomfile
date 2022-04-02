@@ -21,6 +21,7 @@ from argument_parsing import parse_command_line_args_train
 from attack_construction.attack_methods import adversarial_loss_function_batch
 from data import dataset as data
 from RAdam.radam import RAdam
+from torch.nn.parallel import DistributedDataParallel as DDP
 
 print(torch.__version__)
 # This line doesnt work for me
