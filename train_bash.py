@@ -81,7 +81,7 @@ def main():
     )
 
     small_val_loader = torch.utils.data.DataLoader(
-        dataset=torch.utils.data.Subset(dataset_val, range(0, int(len(dataset_val) * val_pecentage))),
+        dataset=torch.utils.data.Subset(dataset_val, range(0, int(len(dataset_val) * 0.01))),
         batch_size=30,
         shuffle=False,
         num_workers=10
@@ -121,9 +121,10 @@ def main():
     for epoch in range(epoches):
         train(attack_module, small_train_loader, augmentations, optimizer, writer, loss_function)
         mAPs = validate(attack_module, small_val_loader, augmentations, annotation_file)
+        print("mAPs: ", mAPs)
         for i, mAP in enumerate(mAPs):
             writer.add_scalar('mAP, model: ' + str(i), mAP, epoch)
-
+            
         save_patch_tensor(attack_module.patch, experiment_dir, epoch=epoch, step=0, save_mode='both')
 
 
