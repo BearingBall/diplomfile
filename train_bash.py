@@ -11,6 +11,8 @@ import torch
 import torch.hub
 import torchvision
 import torchvision.utils
+import torch.distributed as dist
+import torch.multiprocessing as mp
 from torch.utils.tensorboard import SummaryWriter
 
 from attack_construction.attack_class import Attack_class
@@ -19,6 +21,7 @@ from attack_construction.attack_class import validate
 import attack_construction.attack_methods as attack_methods
 from argument_parsing import parse_command_line_args_train
 from attack_construction.attack_methods import adversarial_loss_function_batch
+from attack_construction.utils import save_patch_tensor
 from data import dataset as data
 from RAdam.radam import RAdam
 from torch.nn.parallel import DistributedDataParallel as DDP
@@ -70,6 +73,13 @@ def main():
         num_workers=10
     )
 
+    small_train_loader = torch.utils.data.DataLoader(
+        dataset=torch.utils.data.Subset(dataset, range(0, int(len(dataset) * 0.001))),
+        batch_size=batch_size,
+        shuffle=True,
+        num_workers=10
+    )
+
     small_val_loader = torch.utils.data.DataLoader(
         dataset=torch.utils.data.Subset(dataset_val, range(0, int(len(dataset_val) * val_pecentage))),
         batch_size=30,
@@ -102,16 +112,19 @@ def main():
 
     loss_function = partial(adversarial_loss_function_batch, tv_scale=args.tv_scale)
 
+    #dist.init_process_group("gloo", rank=rank, world_size=world_size)
     attack_module = Attack_class(models, patch)
-    attack_module = DDP(attack_module)
+    #attack_module = DDP(attack_module)
 
     writer = SummaryWriter(log_dir=experiment_dir.as_posix())
 
     for epoch in range(epoches):
-        train(attack_module, train_loader, augmentations, optimizer, writer, loss_function)
-        mAPs = validate(attack_module, val_loader, augmentations, annotation_file)
+        train(attack_module, small_train_loader, augmentations, optimizer, writer, loss_function)
+        mAPs = validate(attack_module, small_val_loader, augmentations, annotation_file)
         for i, mAP in enumerate(mAPs):
             writer.add_scalar('mAP, model: ' + str(i), mAP, epoch)
+
+        save_patch_tensor(attack_module.patch, experiment_dir, epoch=epoch, step=0, save_mode='both')
 
 
 if __name__ == '__main__':
