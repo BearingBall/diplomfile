@@ -120,7 +120,7 @@ def main():
 
     for epoch in range(epoches):
         train(attack_module, small_train_loader, augmentations, optimizer, writer, loss_function)
-        mAPs = validate(attack_module, small_train_loader, augmentations, annotation_file)
+        mAPs = validate(attack_module, small_val_loader, augmentations, annotation_file)
         for i, mAP in enumerate(mAPs):
             writer.add_scalar('mAP, model: ' + str(i), mAP, epoch)
 
