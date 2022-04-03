@@ -119,12 +119,12 @@ def main():
     writer = SummaryWriter(log_dir=experiment_dir.as_posix())
 
     for epoch in range(epoches):
-        train(attack_module, small_train_loader, augmentations, optimizer, writer, loss_function)
-        mAPs = validate(attack_module, small_val_loader, augmentations, annotation_file)
+        train(attack_module, train_loader, augmentations, optimizer, writer, loss_function)
+        mAPs = validate(attack_module, val_loader, augmentations, annotation_file)
         print("mAPs: ", mAPs)
         for i, mAP in enumerate(mAPs):
             writer.add_scalar('mAP, model: ' + str(i), mAP, epoch)
-            
+
         save_patch_tensor(attack_module.patch, experiment_dir, epoch=epoch, step=0, save_mode='both')
 
 
