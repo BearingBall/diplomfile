@@ -30,6 +30,8 @@ def main():
     # need for good experiment logging creation
 
     model = torchvision.models.detection.retinanet_resnet50_fpn(pretrained=True)
+    #model = torchvision.models.detection.ssdlite320_mobilenet_v3_large(pretrained=True)
+    #model = torchvision.models.detection.fasterrcnn_mobilenet_v3_large_fpn(pretrained=True)
     model.eval()
     model = model.float().to(device)
 
