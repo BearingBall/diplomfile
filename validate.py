@@ -44,7 +44,7 @@ def main():
     
     val_loader = torch.utils.data.DataLoader(
         dataset=torch.utils.data.Subset(dataset_val, range(0, int(len(dataset_val)))),
-        batch_size=30,
+        batch_size=10,
         shuffle=True,
         num_workers=10
     )
