@@ -51,7 +51,8 @@ printability_colors = [
 [0.71765, 0.32941, 0.40784]]
 
 
-def printability_loss(patch):
+def printability_loss(patch, device):
+    printability_colors = printability_colors.to(device)
     patch = patch.permute(1, 2, 0)
     dist = []
     for i in range(patch.size()[0]):
