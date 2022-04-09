@@ -20,7 +20,7 @@ def adversarial_loss_function_batch(predicts, patch, device, tv_scale):
 
 
 def adversarial_loss_function(predict, patch, device, tv_scale):
-    return metrics.general_objectness(predict, device) + tv_scale * metrics.total_variation(patch) + 10 * metrics.printability_loss(patch)
+    return metrics.general_objectness(predict, device) + tv_scale * metrics.total_variation(patch) + metrics.printability_loss(patch)
 
 
 def generate_random_patch(resolution=(90, 90)):

@@ -56,6 +56,6 @@ def printability_loss(patch):
     dist = []
     for i in range(patch.size()[0]):
         for j in range(patch.size()[1]):
-            dist.append((np.square(patch[i][j] - torch.tensor(printability_colors))).sum(1).min())
+            dist.append(((patch[i][j] - torch.tensor(printability_colors)).square()).sum(1).min())
 
-    return np.mean(dist)
+    return torch.mean(torch.tensor(dist))
