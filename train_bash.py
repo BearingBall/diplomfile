@@ -46,7 +46,9 @@ def main(rank, world_size):
     val_pecentage = args.val_part
     step_save_frequency = int(args.step_save_frequency)
 
+    print(1)
     dist.init_process_group("gloo", rank=rank, world_size=world_size)
+    print(2)
 
     # need for good experiment logging creation
     experiment_dir.mkdir(parents=True, exist_ok=True)
@@ -119,6 +121,7 @@ def main(rank, world_size):
 
     writer = SummaryWriter(log_dir=experiment_dir.as_posix())
 
+    print(3)
     for epoch in range(epoches):
         train(attack_module, train_loader, augmentations, optimizer, writer, loss_function)
         mAPs = validate(attack_module, val_loader, augmentations, annotation_file)
@@ -127,6 +130,7 @@ def main(rank, world_size):
             writer.add_scalar('mAP, model: ' + str(i), mAP, epoch)
 
         save_patch_tensor(attack_module.patch, experiment_dir, epoch=epoch, step=0, save_mode='both')
+    print(4)
 
 import os
 if __name__ == '__main__':
