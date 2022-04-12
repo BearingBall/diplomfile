@@ -21,7 +21,7 @@ do
         --epochs 20 \
         --rate 3e-2\
         --device 1 \
-	--experiment_dir 'gtrain_14_02_2022_2' \
+	--experiment_dir 'gtrain_13_04_2022' \
 	--tv_scale $TV_SCALE \
 	
 done
