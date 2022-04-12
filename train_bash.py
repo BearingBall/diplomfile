@@ -120,7 +120,9 @@ def main(rank, world_size):
     writer = SummaryWriter(log_dir=experiment_dir.as_posix())
 
     for epoch in range(epoches):
+        print("---")
         train(attack_module, train_loader, augmentations, optimizer, writer, loss_function)
+        print("+++")
         mAPs = validate(attack_module, val_loader, augmentations, annotation_file)
         print("mAPs: ", mAPs)
         for i, mAP in enumerate(mAPs):
@@ -130,7 +132,7 @@ def main(rank, world_size):
 
 import os
 if __name__ == '__main__':
-    world_size = 1
+    world_size = 2
     os.environ["MASTER_ADDR"] = "localhost"
     os.environ["MASTER_PORT"] = "29500"
     mp.spawn(main,
