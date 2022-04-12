@@ -114,7 +114,7 @@ def main():
 
     #dist.init_process_group("gloo", rank=rank, world_size=world_size)
     attack_module = Attack_class(models, patch)
-    #attack_module = DDP(attack_module)
+    attack_module = DDP(attack_module)
 
     writer = SummaryWriter(log_dir=experiment_dir.as_posix())
 
