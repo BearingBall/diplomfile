@@ -46,6 +46,10 @@ def main(rank, world_size):
     val_pecentage = args.val_part
     step_save_frequency = int(args.step_save_frequency)
 
+    print(rank, "init")
+
+    dist.init_process_group("gloo", rank=rank, world_size=world_size)
+
     # need for good experiment logging creation
     experiment_dir.mkdir(parents=True, exist_ok=True)
     writer = SummaryWriter(log_dir=experiment_dir.as_posix())
@@ -112,8 +116,6 @@ def main(rank, world_size):
 
     loss_function = partial(adversarial_loss_function_batch, tv_scale=args.tv_scale)
 
-    dist.init_process_group("gloo", rank=rank, world_size=world_size)
-    print(rank, "initilized")
     attack_module = Attack_class(models, patch)
     attack_module = DDP(attack_module)
 
