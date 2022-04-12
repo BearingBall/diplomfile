@@ -1,6 +1,6 @@
     # environment variables
 dist='torch.distributed.launch'
-python='/home/goncharenko/4tb_folder_first/goncharenko/students/2.yerkovich/.stepan_diploma/bin/python3.9'
+python='python3'
 executable='train_bash.py'
 
 devices='0,1'
