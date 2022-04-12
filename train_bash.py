@@ -46,8 +46,6 @@ def main(rank, world_size):
     val_pecentage = args.val_part
     step_save_frequency = int(args.step_save_frequency)
 
-    print(rank, "init")
-
     dist.init_process_group("gloo", rank=rank, world_size=world_size)
 
     # need for good experiment logging creation
@@ -130,9 +128,11 @@ def main(rank, world_size):
 
         save_patch_tensor(attack_module.patch, experiment_dir, epoch=epoch, step=0, save_mode='both')
 
-
+import os
 if __name__ == '__main__':
     world_size = 2
+    os.environ["MASTER_ADDR"] = "localhost"
+    os.environ["MASTER_PORT"] = "29500"
     mp.spawn(main,
         args=(world_size,),
         nprocs=world_size,
