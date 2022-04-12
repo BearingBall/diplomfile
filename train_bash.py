@@ -130,7 +130,7 @@ def main(rank, world_size):
 
 import os
 if __name__ == '__main__':
-    world_size = 2
+    world_size = 1
     os.environ["MASTER_ADDR"] = "localhost"
     os.environ["MASTER_PORT"] = "29500"
     mp.spawn(main,
