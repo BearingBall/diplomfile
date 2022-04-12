@@ -32,7 +32,7 @@ print(torch.__version__)
 print(torchvision.__version__)
 
 
-def main():
+def main(rank, world_size):
     args = parse_command_line_args_train()
 
     train_images = args.train_data
@@ -112,7 +112,7 @@ def main():
 
     loss_function = partial(adversarial_loss_function_batch, tv_scale=args.tv_scale)
 
-    #dist.init_process_group("gloo", rank=rank, world_size=world_size)
+    dist.init_process_group("gloo", rank=rank, world_size=world_size)
     attack_module = Attack_class(models, patch)
     attack_module = DDP(attack_module)
 
@@ -129,6 +129,10 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    world_size = 2
+    mp.spawn(main,
+        args=(world_size,),
+        nprocs=world_size,
+        join=True)
 
 from torch.nn.parallel import DistributedDataParallel as DDP
