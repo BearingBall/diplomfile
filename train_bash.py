@@ -120,9 +120,7 @@ def main(rank, world_size):
     writer = SummaryWriter(log_dir=experiment_dir.as_posix())
 
     for epoch in range(epoches):
-        print("---")
         train(attack_module, train_loader, augmentations, optimizer, writer, loss_function)
-        print("+++")
         mAPs = validate(attack_module, val_loader, augmentations, annotation_file)
         print("mAPs: ", mAPs)
         for i, mAP in enumerate(mAPs):
