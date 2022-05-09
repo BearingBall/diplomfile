@@ -35,6 +35,7 @@ def insert_patch(image, patch, box, ratio, device, random_place=False):
         return image
 
     resized_patch = T.Resize(size=patch_size, interpolation=T.InterpolationMode.BICUBIC)(patch)
+    resized_patch = torch.clamp(resized_patch, 0, 1)
 
     patch_x_offset = box[2] * (random.uniform(0, 1 - ratio) if random_place else 0.5 - ratio / 2)
     patch_y_offset = box[3] * (random.uniform(0.3, 1 - ratio) if random_place else 0.5 - ratio / 2)

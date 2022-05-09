@@ -1,6 +1,6 @@
 import telebot
 
-bot = telebot.TeleBot('5042122150:AAEA76aSqQBTFaIjGnQMssIpsKkGKuhQTVg')
+bot = telebot.TeleBot('5042122150:AAEJupf6lF5aA5au2_5xe8gOG6MTakN96OM')
 owner_id = 384881851
 
 
@@ -67,6 +67,7 @@ def operate_image(image):
     image = np.asarray(bytearray(image), dtype="uint8")
     image = cv2.imdecode(image, cv2.IMREAD_COLOR)
 
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     image = utils.image_to_tensor(image).to(device)
 
     with torch.no_grad():
@@ -85,12 +86,15 @@ def operate_image(image):
                     int(predict['boxes'][i][2] - predict['boxes'][i][0]),
                     int(predict['boxes'][i][3] - predict['boxes'][i][1])]
             
-            image_attacked = attack.insert_patch(image_attacked, patch, box, 0.3, device, True)
+            image_attacked = attack.insert_patch(image_attacked, patch, box, 0.4, device, True)
 
 
     with torch.no_grad():
         predict = model([image_attacked])[0]        
     result_attacked = attack_utils.visualize_labels_predicted(utils.tensor_to_image(image_attacked), predict, threshold)
+
+    result_raw = cv2.cvtColor(result_raw, cv2.COLOR_RGB2BGR)
+    result_attacked = cv2.cvtColor(result_attacked, cv2.COLOR_RGB2BGR)
 
     return cv2.imencode('.JPEG', result_raw)[1].tobytes(), cv2.imencode('.JPEG', result_attacked)[1].tobytes()
 
