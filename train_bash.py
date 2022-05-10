@@ -26,13 +26,17 @@ from data import dataset as data
 from RAdam.radam import RAdam
 from torch.nn.parallel import DistributedDataParallel as DDP
 
+from enot.distributed import init_torch
+from torch.utils.data import DistributedSampler
+
+
 print(torch.__version__)
 # This line doesnt work for me
 # print(torch.cuda_version)
 print(torchvision.__version__)
 
 
-def main(rank, world_size):
+def main():
     args = parse_command_line_args_train()
 
     train_images = args.train_data
@@ -46,7 +50,7 @@ def main(rank, world_size):
     val_pecentage = args.val_part
     step_save_frequency = int(args.step_save_frequency)
 
-    dist.init_process_group("gloo", rank=rank, world_size=world_size)
+    init_torch(cuda_optimize_for_speed=True)
 
     # need for good experiment logging creation
     experiment_dir.mkdir(parents=True, exist_ok=True)
@@ -72,7 +76,9 @@ def main(rank, world_size):
         dataset=dataset, 
         batch_size=batch_size, 
         shuffle=True, 
-        num_workers=10
+        num_workers=10,
+        sampler=DistributedSampler(
+                dataset=dataset),
     )
 
     small_train_loader = torch.utils.data.DataLoader(
@@ -93,7 +99,9 @@ def main(rank, world_size):
         dataset=torch.utils.data.Subset(dataset_val, range(0, int(len(dataset_val) * val_pecentage))),
         batch_size=30,
         shuffle=True,
-        num_workers=10
+        num_workers=10,
+        sampler=DistributedSampler(
+                dataset=dataset),
     )
 
     annotation_file="../annotations_trainval2017/annotations/instances_val2017.json"
@@ -129,13 +137,6 @@ def main(rank, world_size):
         save_patch_tensor(attack_module.patch, experiment_dir, epoch=epoch, step=0, save_mode='both')
 
 import os
-if __name__ == '__main__':
-    world_size = 2
-    os.environ["MASTER_ADDR"] = "localhost"
-    os.environ["MASTER_PORT"] = "29500"
-    mp.spawn(main,
-        args=(world_size,),
-        nprocs=world_size,
-        join=True)
+main()
 
 from torch.nn.parallel import DistributedDataParallel as DDP
