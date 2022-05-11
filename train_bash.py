@@ -25,8 +25,6 @@ from attack_construction.utils import save_patch_tensor
 from data import dataset as data
 from RAdam.radam import RAdam
 from torch.nn.parallel import DistributedDataParallel as DDP
-
-from enot.distributed import init_torch
 from torch.utils.data import DistributedSampler
 
 
@@ -49,8 +47,6 @@ def main():
     experiment_dir = Path(args.experiment_dir)
     val_pecentage = args.val_part
     step_save_frequency = int(args.step_save_frequency)
-
-    init_torch(cuda_optimize_for_speed=True)
 
     # need for good experiment logging creation
     experiment_dir.mkdir(parents=True, exist_ok=True)
@@ -138,5 +134,3 @@ def main():
 
 import os
 main()
-
-from torch.nn.parallel import DistributedDataParallel as DDP
