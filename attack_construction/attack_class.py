@@ -40,6 +40,8 @@ def validate(my_complex_model, val_dataloader, augmentations, annotation_file):
     for model_index in range(len(my_complex_model.module.models)):
         annotation_after = []
 
+        bar = IncrementalBar(f'Validate {model_index} model in progress progress', max = len(val_dataloader))
+
         for val_idx, (images, labels, img_ids, scale_factor) in enumerate(val_dataloader):
             with torch.no_grad():
                 prediction = my_complex_model(images, labels, model_index, augmentations)
@@ -58,6 +60,8 @@ def validate(my_complex_model, val_dataloader, augmentations, annotation_file):
                     "score": prediction[i]['scores'][j].item()
                 })
 
+            bar.next()
+
         with open("tmp.json", 'w') as f_after:
             json.dump(annotation_after, f_after)
 
@@ -71,7 +75,9 @@ def validate(my_complex_model, val_dataloader, augmentations, annotation_file):
         cocoEval.summarize()
 
         mAPs.append(np.mean(cocoEval.stats))
-    
+
+        bar.finish()
+
     return mAPs 
 
 
