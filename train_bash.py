@@ -93,7 +93,7 @@ def main():
     )
 
     val_loader = torch.utils.data.DataLoader(
-        dataset=torch.utils.data.Subset(dataset_val, range(0, int(len(dataset_val) * val_pecentage))),
+        dataset=torch.utils.data.Subset(dataset_val, range(0, 10)),
         batch_size=30,
         num_workers=10,
     )
