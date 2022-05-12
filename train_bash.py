@@ -86,6 +86,12 @@ def main():
                 dataset=torch.utils.data.Subset(dataset, range(0, 100)))
     )
 
+    small_train_loader_2 = torch.utils.data.DataLoader(
+        dataset=torch.utils.data.Subset(dataset, range(0, 100)),
+        batch_size=batch_size,
+        num_workers=10
+    )
+
     small_val_loader = torch.utils.data.DataLoader(
         dataset=torch.utils.data.Subset(dataset_val, range(0, 100)),
         batch_size=30,
@@ -123,7 +129,7 @@ def main():
 
     for epoch in range(epoches):
         train(attack_module, small_train_loader, augmentations, optimizer, writer, loss_function)
-        mAPs = validate(attack_module, val_loader, augmentations, annotation_file, local_rank)
+        mAPs = validate(attack_module, small_train_loader_2, augmentations, annotation_file, local_rank)
 
         if (local_rank == 0):
             print("mAPs: ", mAPs)

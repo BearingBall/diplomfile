@@ -65,6 +65,9 @@ def validate(my_complex_model, val_dataloader, augmentations, annotation_file, l
 
             bar.next()
 
+        bar.finish()
+        print("")
+
         with open("tmp.json", 'w') as f_after:
             json.dump(annotation_after, f_after)
 
@@ -79,7 +82,6 @@ def validate(my_complex_model, val_dataloader, augmentations, annotation_file, l
 
         mAPs.append(np.mean(cocoEval.stats))
 
-        bar.finish()
 
     return mAPs 
 
