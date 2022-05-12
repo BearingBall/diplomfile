@@ -3,7 +3,7 @@ dist='torch.distributed.launch'
 python='python3'
 executable='train_bash.py'
 
-devices='0,1'
+devices='0'
 
 BATCH_SIZE=10
 TV_SCALE=0.001
