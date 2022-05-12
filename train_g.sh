@@ -16,13 +16,12 @@ for i in 1
 do
     CUDA_VISIBLE_DEVICES=$devices $python $executable \
         --val_labels '../annotation_cutted' \
-        --val_part 0.04 \
+        --val_part 1 \
         --batch_size $BATCH_SIZE \
         --epochs 20 \
-        --rate 3e-2\
         --device 1 \
-	--experiment_dir 'gtrain_13_04_2022' \
-	--tv_scale $TV_SCALE \
+	    --experiment_dir 'gtrain_12_05_2022' \
+	    --tv_scale $TV_SCALE \
 	
 done
 
