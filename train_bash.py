@@ -26,13 +26,14 @@ from data import dataset as data
 from RAdam.radam import RAdam
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.data import DistributedSampler
-
+import os
 
 print(torch.__version__)
 # This line doesnt work for me
 # print(torch.cuda_version)
 print(torchvision.__version__)
-
+local_rank = int(os.environ["LOCAL_RANK"])
+print(local_rank, " rank launched")
 
 def main():
     args = parse_command_line_args_train()
@@ -47,6 +48,8 @@ def main():
     experiment_dir = Path(args.experiment_dir)
     val_pecentage = args.val_part
     step_save_frequency = int(args.step_save_frequency)
+
+    dist.init_process_group(backend="nccl")
 
     # need for good experiment logging creation
     experiment_dir.mkdir(parents=True, exist_ok=True)
@@ -119,7 +122,7 @@ def main():
     loss_function = partial(adversarial_loss_function_batch, tv_scale=args.tv_scale)
 
     attack_module = Attack_class(models, patch)
-    attack_module = DDP(attack_module)
+    attack_module = DDP(attack_module, device_ids=[local_rank], output_device=local_rank)
 
     writer = SummaryWriter(log_dir=experiment_dir.as_posix())
 
@@ -132,5 +135,4 @@ def main():
 
         save_patch_tensor(attack_module.patch, experiment_dir, epoch=epoch, step=0, save_mode='both')
 
-import os
 main()
