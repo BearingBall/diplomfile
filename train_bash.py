@@ -34,6 +34,7 @@ print(torch.__version__)
 print(torchvision.__version__)
 local_rank = int(os.environ["LOCAL_RANK"])
 print(local_rank, " rank launched")
+dist.init_process_group(backend="nccl")
 
 def main():
     args = parse_command_line_args_train()
@@ -48,8 +49,6 @@ def main():
     experiment_dir = Path(args.experiment_dir)
     val_pecentage = args.val_part
     step_save_frequency = int(args.step_save_frequency)
-
-    dist.init_process_group(backend="nccl")
 
     # need for good experiment logging creation
     experiment_dir.mkdir(parents=True, exist_ok=True)
