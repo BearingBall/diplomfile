@@ -83,7 +83,7 @@ def main():
         batch_size=batch_size,
         num_workers=10,
         sampler=DistributedSampler(
-                dataset=dataset)
+                dataset=torch.utils.data.Subset(dataset, range(0, 40)))
     )
 
     small_val_loader = torch.utils.data.DataLoader(
