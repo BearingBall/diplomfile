@@ -130,7 +130,7 @@ def main():
             for i, mAP in enumerate(mAPs):
                 writer.add_scalar('mAP, model: ' + str(i), mAP, epoch)
 
-            save_patch_tensor(attack_module.patch, experiment_dir, epoch=epoch, step=0, save_mode='both')
+            save_patch_tensor(attack_module.module.patch, experiment_dir, epoch=epoch, step=0, save_mode='both')
 
         dist.barrier()
 
