@@ -97,7 +97,7 @@ def main():
         batch_size=30,
         num_workers=10,
         sampler=DistributedSampler(
-                dataset=dataset),
+                dataset=torch.utils.data.Subset(dataset_val, range(0, int(len(dataset_val) * val_pecentage)))),
     )
 
     annotation_file="../annotations_trainval2017/annotations/instances_val2017.json"
