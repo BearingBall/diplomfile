@@ -71,11 +71,11 @@ def main():
     dataset_val = data.MsCocoDataset((640, 640), val_images, val_labels)
 
     train_loader = torch.utils.data.DataLoader(
-        dataset=torch.utils.data.Subset(dataset_val, range(0, 300), 
+        dataset=torch.utils.data.Subset(dataset_val, range(0, 300)), 
         batch_size=batch_size, 
         num_workers=10,
         sampler=DistributedSampler(
-                dataset=torch.utils.data.Subset(dataset_val, range(0, 300)),
+                dataset=torch.utils.data.Subset(dataset_val, range(0, 300))),
     )
 
     small_train_loader = torch.utils.data.DataLoader(
