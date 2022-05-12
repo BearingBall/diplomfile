@@ -22,7 +22,7 @@ do
         --batch_size $BATCH_SIZE \
         --epochs 20 \
         --device 1 \
-	    --experiment_dir 'gtrain_12_05_2022_3' \
+	    --experiment_dir 'gtrain_12_05_2022_4' \
 	    --tv_scale $TV_SCALE \
 	
 done

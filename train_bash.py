@@ -122,8 +122,8 @@ def main():
     writer = SummaryWriter(log_dir=experiment_dir.as_posix())
 
     for epoch in range(epoches):
-        train(attack_module, small_train_loader, augmentations, optimizer, writer, loss_function)
-        mAPs = validate(attack_module, small_val_loader, augmentations, annotation_file, local_rank)
+        train(attack_module, train_loader, augmentations, optimizer, writer, loss_function)
+        mAPs = validate(attack_module, val_loader, augmentations, annotation_file, local_rank)
 
         if (local_rank == 0):
             print("mAPs: ", mAPs)
