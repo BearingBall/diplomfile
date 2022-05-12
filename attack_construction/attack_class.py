@@ -34,7 +34,10 @@ def train(my_complex_model, train_dataloader, augmentations, optimizer, writer, 
 
 
 #в разработке
-def validate(my_complex_model, val_dataloader, augmentations, annotation_file):
+def validate(my_complex_model, val_dataloader, augmentations, annotation_file, local_rank):
+    if (local_rank != 0):
+        return
+
     mAPs = []
 
     for model_index in range(len(my_complex_model.module.models)):
