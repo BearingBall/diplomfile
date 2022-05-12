@@ -124,10 +124,14 @@ def main():
     for epoch in range(epoches):
         train(attack_module, small_train_loader, augmentations, optimizer, writer, loss_function)
         mAPs = validate(attack_module, val_loader, augmentations, annotation_file, local_rank)
-        print("mAPs: ", mAPs)
-        for i, mAP in enumerate(mAPs):
-            writer.add_scalar('mAP, model: ' + str(i), mAP, epoch)
 
-        save_patch_tensor(attack_module.patch, experiment_dir, epoch=epoch, step=0, save_mode='both')
+        if (local_rank == 0):
+            print("mAPs: ", mAPs)
+            for i, mAP in enumerate(mAPs):
+                writer.add_scalar('mAP, model: ' + str(i), mAP, epoch)
+
+            save_patch_tensor(attack_module.patch, experiment_dir, epoch=epoch, step=0, save_mode='both')
+
+        dist.barrier()
 
 main()
