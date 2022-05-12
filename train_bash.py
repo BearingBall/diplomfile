@@ -104,8 +104,6 @@ def main():
     patch = patch.to(f'cuda:{local_rank}')
     patch.requires_grad = True
 
-    optimizer = RAdam([patch], lr=grad_rate)
-
     augmentations = torchvision.transforms.Compose([
         torchvision.transforms.ColorJitter(brightness=(0.8, 1.2), contrast=(0.8, 1.2)),
         torchvision.transforms.GaussianBlur(kernel_size=(5, 5), sigma=(1.2, 1.2)),
@@ -118,6 +116,8 @@ def main():
 
     attack_module = Attack_class(models, patch, local_rank)
     attack_module = DDP(attack_module, device_ids=[local_rank], output_device=local_rank)
+
+    optimizer = RAdam([attack_module.module.patch], lr=grad_rate)
 
     writer = SummaryWriter(log_dir=experiment_dir.as_posix())
 
