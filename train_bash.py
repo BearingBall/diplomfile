@@ -79,11 +79,11 @@ def main():
     )
 
     small_train_loader = torch.utils.data.DataLoader(
-        dataset=torch.utils.data.Subset(dataset, range(0, 40)),
+        dataset=dataset,
         batch_size=batch_size,
         num_workers=10,
         sampler=DistributedSampler(
-                dataset=torch.utils.data.Subset(dataset, range(0, 40)))
+                dataset=dataset)
     )
 
     small_val_loader = torch.utils.data.DataLoader(
@@ -93,7 +93,7 @@ def main():
     )
 
     val_loader = torch.utils.data.DataLoader(
-        dataset=torch.utils.data.Subset(dataset_val, range(0, 10)),
+        dataset=torch.utils.data.Subset(dataset_val, range(0, int(len(dataset_val) * val_pecentage))),
         batch_size=30,
         num_workers=10,
     )
