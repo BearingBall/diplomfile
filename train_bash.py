@@ -79,9 +79,11 @@ def main():
     )
 
     small_train_loader = torch.utils.data.DataLoader(
-        dataset=torch.utils.data.Subset(dataset, range(0, int(len(dataset) * 0.001))),
+        dataset=torch.utils.data.Subset(dataset, range(0, 40)),
         batch_size=batch_size,
-        num_workers=10
+        num_workers=10,
+        sampler=DistributedSampler(
+                dataset=dataset)
     )
 
     small_val_loader = torch.utils.data.DataLoader(
@@ -122,7 +124,7 @@ def main():
     writer = SummaryWriter(log_dir=experiment_dir.as_posix())
 
     for epoch in range(epoches):
-        train(attack_module, train_loader, augmentations, optimizer, writer, loss_function)
+        train(attack_module, small_train_loader, augmentations, optimizer, writer, loss_function)
         mAPs = validate(attack_module, val_loader, augmentations, annotation_file)
         print("mAPs: ", mAPs)
         for i, mAP in enumerate(mAPs):
