@@ -11,10 +11,12 @@ TV_SCALE=0.001
 PATH_TO_COCO='/home/goncharenko/4tb_folder_first/data/coco_orig/'
 PATH_TO_COCO_ANN=$PATH_TO_COCO'annotations_trainval2017/annotations/'
 
+NUM_TRAINERS=2
+
 
 for i in 1
 do
-    CUDA_VISIBLE_DEVICES=$devices $python $executable \
+    CUDA_VISIBLE_DEVICES=$devices $python --nproc_per_node=$NUM_TRAINERS $executable \
         --val_labels '../annotation_cutted' \
         --val_part 1 \
         --batch_size $BATCH_SIZE \
