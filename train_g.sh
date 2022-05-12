@@ -5,7 +5,7 @@ executable='train_bash.py'
 
 devices='0,1'
 
-BATCH_SIZE=10
+BATCH_SIZE=9
 TV_SCALE=0.001
 
 PATH_TO_COCO='/home/goncharenko/4tb_folder_first/data/coco_orig/'
