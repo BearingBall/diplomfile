@@ -16,9 +16,9 @@ def train(my_complex_model, train_dataloader, augmentations, optimizer, writer, 
     bar = IncrementalBar('Epoch progress', max = len(train_dataloader))
 
     for step_num, (images, labels, _, _) in enumerate(train_dataloader):
-        for model_index in range(len(my_complex_model.models)):
+        for model_index in range(len(my_complex_model.module.models)):
             prediction = my_complex_model(images, labels, model_index, augmentations)
-            costs = loss(prediction, my_complex_model.patch)
+            costs = loss(prediction, my_complex_model.module.patch)
             cost = sum(costs)
             cost.backward()
         
@@ -26,7 +26,7 @@ def train(my_complex_model, train_dataloader, augmentations, optimizer, writer, 
         optimizer.zero_grad()
 
         with torch.no_grad():
-            my_complex_model.patch.data.clamp_(0,1)
+            my_complex_model.module.patch.data.clamp_(0,1)
 
         bar.next()
     
@@ -37,7 +37,7 @@ def train(my_complex_model, train_dataloader, augmentations, optimizer, writer, 
 def validate(my_complex_model, val_dataloader, augmentations, annotation_file):
     mAPs = []
 
-    for model_index in range(len(my_complex_model.models)):
+    for model_index in range(len(my_complex_model.module.models)):
         annotation_after = []
 
         for val_idx, (images, labels, img_ids, scale_factor) in enumerate(val_dataloader):
