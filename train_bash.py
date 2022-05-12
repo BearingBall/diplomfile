@@ -86,14 +86,6 @@ def main():
                 dataset=torch.utils.data.Subset(dataset, range(0, 100)))
     )
 
-    small_val_loader_2 = torch.utils.data.DataLoader(
-        dataset=torch.utils.data.Subset(dataset_val, range(0, 100)),
-        batch_size=batch_size,
-        num_workers=10,
-        sampler=DistributedSampler(
-                dataset=torch.utils.data.Subset(dataset, range(0, 100)))
-    )
-
     small_val_loader = torch.utils.data.DataLoader(
         dataset=torch.utils.data.Subset(dataset_val, range(0, 100)),
         batch_size=30,
@@ -130,8 +122,8 @@ def main():
     writer = SummaryWriter(log_dir=experiment_dir.as_posix())
 
     for epoch in range(epoches):
-        train(attack_module, small_val_loader_2, augmentations, optimizer, writer, loss_function)
-        mAPs = validate(attack_module, small_val_loader, augmentations, annotation_file, local_rank)
+        train(attack_module, train_loader, augmentations, optimizer, writer, loss_function)
+        mAPs = validate(attack_module, val_loader, augmentations, annotation_file, local_rank)
 
         if (local_rank == 0):
             print("mAPs: ", mAPs)
