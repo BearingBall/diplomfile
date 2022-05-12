@@ -114,7 +114,7 @@ def main():
 
     augmentations = None
 
-    loss_function = partial(adversarial_loss_function_batch, tv_scale=args.tv_scale)
+    loss_function = partial(adversarial_loss_function_batch, tv_scale=args.tv_scale, local_rank=local_rank)
 
     attack_module = Attack_class(models, patch, local_rank)
     attack_module = DDP(attack_module, device_ids=[local_rank], output_device=local_rank)
