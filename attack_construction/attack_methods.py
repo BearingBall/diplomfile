@@ -27,7 +27,7 @@ def generate_random_patch(resolution=(90, 90)):
     return torch.rand(3, resolution[0], resolution[1])
 
 
-def insert_patch(image, patch, box, ratio, random_place=False):
+def insert_patch(image, patch, box, ratio, local_rank ,random_place=False):
     patch_size = (int(box[3] * ratio), int(box[2] * ratio))
 
     # cant insert patch with this box parameters
@@ -44,7 +44,7 @@ def insert_patch(image, patch, box, ratio, random_place=False):
 
     padding = (x_shift, y_shift, image.shape[2] - x_shift - patch_size[1], image.shape[1] - y_shift - patch_size[0])
     padded_patch = T.Pad(padding=padding)(resized_patch)
-    patch_mask = T.Pad(padding=padding)(torch.ones(size=(3, patch_size[0], patch_size[1]))).cuda()
+    patch_mask = T.Pad(padding=padding)(torch.ones(size=(3, patch_size[0], patch_size[1]))).to(f'cuda:{local_rank}')
     result = padded_patch + (torch.ones_like(image) - patch_mask) * image
     return result
 
@@ -97,7 +97,7 @@ def training_step_multymodels(models, patch, augmentations, images, labels, loss
             attacked_image = image.to(device)
 
             for label in labels[i]:
-                attacked_image = insert_patch(attacked_image, augmented_patch, label, 0.4, device, True)
+                attacked_image = insert_patch(attacked_image, augmented_patch, label, 0.4, device, model.model.local_rank, True)
 
             attacked_images.append(attacked_image)
 
@@ -147,7 +147,7 @@ def validate(
         if augmented_patch is not None:
             for i, _ in enumerate(images):
                 for label in labels[i]:
-                    attacked_images[i] = insert_patch(attacked_images[i], augmented_patch, label, 0.4, device, True)
+                    attacked_images[i] = insert_patch(attacked_images[i], augmented_patch, label, 0.4, device, model.model.local_rank , True)
 
         with torch.no_grad():
             predict = model(attacked_images)

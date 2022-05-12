@@ -78,10 +78,11 @@ def validate(my_complex_model, val_dataloader, augmentations, annotation_file):
 
 
 class Attack_class(nn.Module):
-    def __init__(self, models, patch):
+    def __init__(self, models, patch, local_rank):
         super().__init__()
         self.models = models
         self.patch = nn.Parameter(data=patch)
+        self.local_rank = local_rank
 
 
     def forward(self, images, labels, model_index, augmentations):
@@ -93,11 +94,11 @@ class Attack_class(nn.Module):
         attacked_images = []
 
         for i, image in enumerate(images):
-            attacked_image = image.cuda()
+            attacked_image = image.to(f'cuda:{self.local_rank}')
 
             if labels[i][0][2] * labels[i][0][3] != 0:
                 for label in labels[i]:
-                    attacked_image = attack.insert_patch(attacked_image, augmented_patch, label, 0.4, True)
+                    attacked_image = attack.insert_patch(attacked_image, augmented_patch, label, 0.4, self.local_rank, True)
 
             attacked_images.append(attacked_image)
 

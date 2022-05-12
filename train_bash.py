@@ -61,7 +61,7 @@ def main():
 
     for model in models:
         model.eval()
-        model = model.float().cuda()
+        model = model.float().to(f'cuda:{local_rank}')
 
         for param in model.parameters():
             param.requires_grad = False
@@ -101,7 +101,7 @@ def main():
     annotation_file="../annotations_trainval2017/annotations/instances_val2017.json"
 
     patch = attack_methods.generate_random_patch()
-    patch = patch.cuda()
+    patch = patch.to(f'cuda:{local_rank}')
     patch.requires_grad = True
 
     optimizer = RAdam([patch], lr=grad_rate)
@@ -116,7 +116,7 @@ def main():
 
     loss_function = partial(adversarial_loss_function_batch, tv_scale=args.tv_scale)
 
-    attack_module = Attack_class(models, patch)
+    attack_module = Attack_class(models, patch, local_rank)
     attack_module = DDP(attack_module, device_ids=[local_rank], output_device=local_rank)
 
     writer = SummaryWriter(log_dir=experiment_dir.as_posix())
