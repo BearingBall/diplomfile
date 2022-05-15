@@ -51,17 +51,18 @@ def validate(my_complex_model, val_dataloader, augmentations, annotation_file, l
 
             for i in range(len(prediction)):
                 for j in range(len(prediction[i]["labels"])):
-                    annotation_after.append({
-                        'image_id': img_ids[i].item(),
-                        'category_id': prediction[i]["labels"][j].item(),
-                        'bbox': [
-                          prediction[i]["boxes"][j][0].item() / scale_factor[i][0].item(),
-                          prediction[i]["boxes"][j][1].item() / scale_factor[i][1].item(),
-                          (prediction[i]["boxes"][j][2].item() - prediction[i]["boxes"][j][0].item()) / scale_factor[i][0].item(),
-                          (prediction[i]["boxes"][j][3].item() - prediction[i]["boxes"][j][1].item()) / scale_factor[i][1].item()
-                    ],
-                    "score": prediction[i]['scores'][j].item()
-                })
+                    if (prediction[i]["labels"][j].item() == 1):
+                        annotation_after.append({
+                            'image_id': img_ids[i].item(),
+                            'category_id': prediction[i]["labels"][j].item(),
+                            'bbox': [
+                                prediction[i]["boxes"][j][0].item() / scale_factor[i][0].item(),
+                                prediction[i]["boxes"][j][1].item() / scale_factor[i][1].item(),
+                                (prediction[i]["boxes"][j][2].item() - prediction[i]["boxes"][j][0].item()) / scale_factor[i][0].item(),
+                                (prediction[i]["boxes"][j][3].item() - prediction[i]["boxes"][j][1].item()) / scale_factor[i][1].item()
+                            ],
+                            "score": prediction[i]['scores'][j].item()
+                        })
 
             bar.next()
 
