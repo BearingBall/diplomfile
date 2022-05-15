@@ -12,8 +12,8 @@ from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
 
 
-def train(my_complex_model, train_dataloader, augmentations, optimizer, writer, loss):
-    bar = IncrementalBar('Epoch progress', max = len(train_dataloader))
+def train(my_complex_model, train_dataloader, augmentations, optimizer, writer, loss, epoch):
+    bar = IncrementalBar(f'Epoch {epoch} progress', max = len(train_dataloader))
 
     for step_num, (images, labels, _, _) in enumerate(train_dataloader):
         for model_index in range(len(my_complex_model.module.models)):
