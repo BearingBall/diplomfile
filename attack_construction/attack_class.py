@@ -51,18 +51,17 @@ def validate(my_complex_model, val_dataloader, augmentations, annotation_file, l
 
             for i in range(len(prediction)):
                 for j in range(len(prediction[i]["labels"])):
-                    if (prediction[i]["labels"][j].item() == 1):
-                        annotation_after.append({
-                            'image_id': img_ids[i].item(),
-                            'category_id': prediction[i]["labels"][j].item(),
-                            'bbox': [
-                                prediction[i]["boxes"][j][0].item() / scale_factor[i][0].item(),
-                                prediction[i]["boxes"][j][1].item() / scale_factor[i][1].item(),
-                                (prediction[i]["boxes"][j][2].item() - prediction[i]["boxes"][j][0].item()) / scale_factor[i][0].item(),
-                                (prediction[i]["boxes"][j][3].item() - prediction[i]["boxes"][j][1].item()) / scale_factor[i][1].item()
-                            ],
-                            "score": prediction[i]['scores'][j].item()
-                        })
+                    annotation_after.append({
+                        'image_id': img_ids[i].item(),
+                        'category_id': prediction[i]["labels"][j].item(),
+                        'bbox': [
+                            prediction[i]["boxes"][j][0].item() / scale_factor[i][0].item(),
+                            prediction[i]["boxes"][j][1].item() / scale_factor[i][1].item(),
+                            (prediction[i]["boxes"][j][2].item() - prediction[i]["boxes"][j][0].item()) / scale_factor[i][0].item(),
+                            (prediction[i]["boxes"][j][3].item() - prediction[i]["boxes"][j][1].item()) / scale_factor[i][1].item()
+                        ],
+                        "score": prediction[i]['scores'][j].item()
+                    })
 
             bar.next()
 
@@ -108,9 +107,9 @@ class Attack_class(nn.Module):
         for i, image in enumerate(images):
             attacked_image = image.to(f'cuda:{self.local_rank}')
 
-            #if labels[i][0][2] * labels[i][0][3] != 0:
-            #    for label in labels[i]:
-            #        attacked_image = attack.insert_patch(attacked_image, augmented_patch, label, 0.4, self.local_rank, True)
+            if labels[i][0][2] * labels[i][0][3] != 0:
+                for label in labels[i]:
+                    attacked_image = attack.insert_patch(attacked_image, augmented_patch, label, 0.4, self.local_rank, True)
 
             attacked_images.append(attacked_image)
 
