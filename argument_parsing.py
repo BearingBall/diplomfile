@@ -36,7 +36,7 @@ def parse_command_line_args_train():
         help='percentage of validation data',
         required=False,
         type=float,
-        default=0.05,
+        default=1,
     )
     parser.add_argument(
         '--batch_size',
