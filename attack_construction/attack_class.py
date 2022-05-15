@@ -106,9 +106,9 @@ class Attack_class(nn.Module):
         for i, image in enumerate(images):
             attacked_image = image.to(f'cuda:{self.local_rank}')
 
-            if labels[i][0][2] * labels[i][0][3] != 0:
-                for label in labels[i]:
-                    attacked_image = attack.insert_patch(attacked_image, augmented_patch, label, 0.4, self.local_rank, True)
+            #if labels[i][0][2] * labels[i][0][3] != 0:
+            #    for label in labels[i]:
+            #        attacked_image = attack.insert_patch(attacked_image, augmented_patch, label, 0.4, self.local_rank, True)
 
             attacked_images.append(attacked_image)
 
