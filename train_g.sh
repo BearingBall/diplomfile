@@ -17,7 +17,6 @@ master_port=1234
 for i in 1
 do
     CUDA_VISIBLE_DEVICES=$devices $python --nproc_per_node=$NUM_TRAINERS --master_port=$master_port $executable \
-    
         --val_part 1 \
         --batch_size $BATCH_SIZE \
         --epochs 20 \
