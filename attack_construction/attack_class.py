@@ -79,6 +79,7 @@ def validate(my_complex_model, val_dataloader, augmentations, annotation_file, l
         cocoEval.accumulate()
         cocoEval.summarize()
 
+        print("mAP =", np.mean(cocoEval.stats))
         mAPs.append(np.mean(cocoEval.stats))
 
 
