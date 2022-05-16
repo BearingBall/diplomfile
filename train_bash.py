@@ -79,11 +79,11 @@ def main():
     )
 
     small_train_loader = torch.utils.data.DataLoader(
-        dataset=torch.utils.data.Subset(dataset, range(0, 100)),
+        dataset=torch.utils.data.Subset(dataset, range(0, 21)),
         batch_size=batch_size,
         num_workers=10,
         sampler=DistributedSampler(
-                dataset=torch.utils.data.Subset(dataset, range(0, 100)))
+                dataset=torch.utils.data.Subset(dataset, range(0, 21)))
     )
 
     small_val_loader = torch.utils.data.DataLoader(
@@ -130,14 +130,14 @@ def main():
     #dist.barrier()
 
     for epoch in range(1, epoches):
-        train(attack_module, train_loader, augmentations, optimizer, writer, loss_function, epoch)
-        mAPs = validate(attack_module, val_loader, augmentations, annotation_file, local_rank)
+        train(attack_module, small_train_loader, augmentations, optimizer, writer, loss_function, epoch)
+        #mAPs = validate(attack_module, val_loader, augmentations, annotation_file, local_rank)
 
-        if (local_rank == 0):
-            print("mAPs: ", mAPs)
-            for i, mAP in enumerate(mAPs):
-                writer.add_scalar('mAP, model: ' + str(i), mAP, epoch)
-            save_patch_tensor(attack_module.module.patch, experiment_dir, epoch=epoch, step=0, save_mode='both')
-        dist.barrier()
+        #if (local_rank == 0):
+        #    print("mAPs: ", mAPs)
+        #    for i, mAP in enumerate(mAPs):
+        #        writer.add_scalar('mAP, model: ' + str(i), mAP, epoch)
+        #    save_patch_tensor(attack_module.module.patch, experiment_dir, epoch=epoch, step=0, save_mode='both')
+        #dist.barrier()
 
 main()
