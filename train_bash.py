@@ -55,8 +55,8 @@ def main():
     writer = SummaryWriter(log_dir=experiment_dir.as_posix())
 
     models = [  torchvision.models.detection.retinanet_resnet50_fpn(pretrained=True),
-                torchvision.models.detection.ssdlite320_mobilenet_v3_large(pretrained=True),
-                torchvision.models.detection.fasterrcnn_mobilenet_v3_large_fpn(pretrained=True)
+                #torchvision.models.detection.ssdlite320_mobilenet_v3_large(pretrained=True),
+                #torchvision.models.detection.fasterrcnn_mobilenet_v3_large_fpn(pretrained=True)
              ]
 
     for model in models:
