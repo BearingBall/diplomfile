@@ -55,8 +55,8 @@ def main():
     writer = SummaryWriter(log_dir=experiment_dir.as_posix())
 
     models = [  torchvision.models.detection.retinanet_resnet50_fpn(pretrained=True),
-                #torchvision.models.detection.ssdlite320_mobilenet_v3_large(pretrained=True),
-                #torchvision.models.detection.fasterrcnn_mobilenet_v3_large_fpn(pretrained=True)
+                torchvision.models.detection.ssdlite320_mobilenet_v3_large(pretrained=True),
+                torchvision.models.detection.fasterrcnn_mobilenet_v3_large_fpn(pretrained=True)
              ]
 
     for model in models:
@@ -121,23 +121,23 @@ def main():
 
     writer = SummaryWriter(log_dir=experiment_dir.as_posix())
 
-    #mAPs = validate(attack_module, val_loader, augmentations, annotation_file, local_rank)
-    #if (local_rank == 0):
-    #    print("Raw mAPs: ", mAPs)
-    #    for i, mAP in enumerate(mAPs):
-    #        writer.add_scalar('mAP, model: ' + str(i), mAP, 0)
-    #    save_patch_tensor(attack_module.module.patch, experiment_dir, epoch=0, step=0, save_mode='both')
-    #dist.barrier()
+    mAPs = validate(attack_module, val_loader, augmentations, annotation_file, local_rank)
+    if (local_rank == 0):
+        print("Raw mAPs: ", mAPs)
+        for i, mAP in enumerate(mAPs):
+            writer.add_scalar('mAP, model: ' + str(i), mAP, 0)
+        save_patch_tensor(attack_module.module.patch, experiment_dir, epoch=0, step=0, save_mode='both')
+    dist.barrier()
 
     for epoch in range(1, epoches):
-        train(attack_module, small_train_loader, augmentations, optimizer, writer, loss_function, epoch)
-        #mAPs = validate(attack_module, val_loader, augmentations, annotation_file, local_rank)
+        train(attack_module, train_loader, augmentations, optimizer, writer, loss_function, epoch)
+        mAPs = validate(attack_module, val_loader, augmentations, annotation_file, local_rank)
 
-        #if (local_rank == 0):
-        #    print("mAPs: ", mAPs)
-        #    for i, mAP in enumerate(mAPs):
-        #        writer.add_scalar('mAP, model: ' + str(i), mAP, epoch)
-        #    save_patch_tensor(attack_module.module.patch, experiment_dir, epoch=epoch, step=0, save_mode='both')
+        if (local_rank == 0):
+            print("mAPs: ", mAPs)
+            for i, mAP in enumerate(mAPs):
+                writer.add_scalar('mAP, model: ' + str(i), mAP, epoch)
+            save_patch_tensor(attack_module.module.patch, experiment_dir, epoch=epoch, step=0, save_mode='both')
         dist.barrier()
 
 main()
