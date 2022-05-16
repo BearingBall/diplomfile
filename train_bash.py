@@ -79,11 +79,11 @@ def main():
     )
 
     small_train_loader = torch.utils.data.DataLoader(
-        dataset=torch.utils.data.Subset(dataset, range(0, 21)),
+        dataset=torch.utils.data.Subset(dataset, range(0, 10)),
         batch_size=batch_size,
         num_workers=10,
         sampler=DistributedSampler(
-                dataset=torch.utils.data.Subset(dataset, range(0, 21)))
+                dataset=torch.utils.data.Subset(dataset, range(0, 10)))
     )
 
     small_val_loader = torch.utils.data.DataLoader(
@@ -138,6 +138,6 @@ def main():
         #    for i, mAP in enumerate(mAPs):
         #        writer.add_scalar('mAP, model: ' + str(i), mAP, epoch)
         #    save_patch_tensor(attack_module.module.patch, experiment_dir, epoch=epoch, step=0, save_mode='both')
-        #dist.barrier()
+        dist.barrier()
 
 main()
