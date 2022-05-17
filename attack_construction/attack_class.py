@@ -20,7 +20,6 @@ def train(my_complex_model, train_dataloader, augmentations, optimizer, writer, 
             prediction = my_complex_model(images, labels, model_index, augmentations)
             costs = loss(prediction, my_complex_model.module.patch)
             cost = sum(costs)
-            print("loss =", cost)
             cost.backward()
         
         optimizer.step()
