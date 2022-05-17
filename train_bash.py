@@ -117,7 +117,8 @@ def main():
     attack_module = Attack_class(models, patch, local_rank)
     attack_module = DDP(attack_module, device_ids=[local_rank], output_device=local_rank)
 
-    optimizer = RAdam([attack_module.module.patch], lr=grad_rate)
+    #optimizer = RAdam([attack_module.module.patch], lr=grad_rate)
+    optimizer = torch.optim.SGD([attack_module.module.patch], lr=grad_rate, momentum=0.9)
 
     writer = SummaryWriter(log_dir=experiment_dir.as_posix())
 
