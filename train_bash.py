@@ -99,22 +99,7 @@ def main():
         num_workers=10,
     )
 
-
-    
     patch = attack_methods.generate_random_patch()
-
-    from attack_construction.utils import load_tensor_from_image
-    if (local_rank == 0):
-        patch = load_tensor_from_image("./gtrain_13_05_2022_2/image/patch_16_0.png")
-        if (patch != None):
-            print("Patch success ", local_rank)
-    dist.barrier()
-    if (local_rank == 1):
-        patch = load_tensor_from_image("./gtrain_13_05_2022_2/image/patch_16_0.png")
-        if (patch != None):
-            print("Patch success ", local_rank)
-    dist.barrier()
-
     patch = patch.to(f'cuda:{local_rank}')
     patch.requires_grad = True
 
