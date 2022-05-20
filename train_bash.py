@@ -69,7 +69,7 @@ def main():
 
     # TODO: use resize to pull picture in batch
     dataset = data.MsCocoDataset((640, 640), train_images, train_labels)
-    dataset_val = data.MsCocoDataset((640, 640), val_images, annotation_file)
+    dataset_val = data.MsCocoDataset((640, 640), val_images, val_labels)
 
     train_loader = torch.utils.data.DataLoader(
         dataset=dataset, 
@@ -99,7 +99,22 @@ def main():
         num_workers=10,
     )
 
+
+    
     patch = attack_methods.generate_random_patch()
+
+    from attack_construction.utils import load_tensor_from_image
+    if (local_rank == 0):
+        patch = load_tensor_from_image("./gtrain_13_05_2022_2/image/patch_16_0.png")
+        if (patch != None):
+            print("Patch success ", local_rank)
+    dist.barrier()
+    if (local_rank == 1):
+        patch = load_tensor_from_image("./gtrain_13_05_2022_2/image/patch_16_0.png")
+        if (patch != None):
+            print("Patch success ", local_rank)
+    dist.barrier()
+
     patch = patch.to(f'cuda:{local_rank}')
     patch.requires_grad = True
 
@@ -116,8 +131,8 @@ def main():
     attack_module = Attack_class(models, patch, local_rank)
     attack_module = DDP(attack_module, device_ids=[local_rank], output_device=local_rank)
 
-    #optimizer = RAdam([attack_module.module.patch], lr=grad_rate)
-    optimizer = torch.optim.SGD([attack_module.module.patch], lr=grad_rate, momentum=0.9)
+    optimizer = RAdam([attack_module.module.patch], lr=grad_rate)
+    #optimizer = torch.optim.SGD([attack_module.module.patch], lr=grad_rate, momentum=0.9)
 
     writer = SummaryWriter(log_dir=experiment_dir.as_posix())
 
