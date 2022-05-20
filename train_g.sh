@@ -18,6 +18,7 @@ for i in 1
 do
     CUDA_VISIBLE_DEVICES=$devices $python --nproc_per_node=$NUM_TRAINERS --master_port=$master_port $executable \
         --val_part 1 \
+        --val_labels "../../annotations_trainval2017/annotations/instances_val2017.json" \
         --batch_size $BATCH_SIZE \
         --epochs 20 \
         --device 1 \

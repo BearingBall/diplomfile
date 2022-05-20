@@ -98,7 +98,8 @@ def main():
         num_workers=10,
     )
 
-    annotation_file="../annotations_trainval2017/annotations/instances_val2017.json"
+    annotation_file="../../annotations_trainval2017/annotations/instances_val2017.json"
+    
 
     patch = attack_methods.generate_random_patch()
     patch = patch.to(f'cuda:{local_rank}')
