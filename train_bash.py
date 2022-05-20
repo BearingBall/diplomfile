@@ -136,7 +136,7 @@ def main():
 
     writer = SummaryWriter(log_dir=experiment_dir.as_posix())
 
-    mAPs = validate(attack_module, val_loader, augmentations, annotation_file, local_rank)
+    mAPs = validate(attack_module, val_loader, augmentations, val_labels, local_rank)
     if (local_rank == 0):
         print("Raw mAPs: ", mAPs)
         for i, mAP in enumerate(mAPs):
@@ -146,7 +146,7 @@ def main():
 
     for epoch in range(1, epoches):
         train(attack_module, train_loader, augmentations, optimizer, writer, loss_function, epoch)
-        mAPs = validate(attack_module, val_loader, augmentations, annotation_file, local_rank)
+        mAPs = validate(attack_module, val_loader, augmentations, val_labels, local_rank)
 
         if (local_rank == 0):
             print("mAPs: ", mAPs)

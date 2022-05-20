@@ -18,11 +18,12 @@ for i in 1
 do
     CUDA_VISIBLE_DEVICES=$devices $python --nproc_per_node=$NUM_TRAINERS --master_port=$master_port $executable \
         --val_part 1 \
+        --val_labels "../annotation_cutted --patch" \
         --batch_size $BATCH_SIZE \
         --epochs 20 \
         --device 1 \
         --rate 0.12 \
-	    --experiment_dir 'gtrain_20_05_2022' \
+	    --experiment_dir 'gtrain_21_05_2022' \
 	    --tv_scale $TV_SCALE \
 	
 done
