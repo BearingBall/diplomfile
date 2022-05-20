@@ -49,6 +49,7 @@ def main():
     experiment_dir = Path(args.experiment_dir)
     val_pecentage = args.val_part
     step_save_frequency = int(args.step_save_frequency)
+    annotation_file="../annotations_trainval2017/annotations/instances_val2017.json"
 
     # need for good experiment logging creation
     experiment_dir.mkdir(parents=True, exist_ok=True)
@@ -68,7 +69,7 @@ def main():
 
     # TODO: use resize to pull picture in batch
     dataset = data.MsCocoDataset((640, 640), train_images, train_labels)
-    dataset_val = data.MsCocoDataset((640, 640), val_images, val_labels)
+    dataset_val = data.MsCocoDataset((640, 640), val_images, annotation_file)
 
     train_loader = torch.utils.data.DataLoader(
         dataset=dataset, 
@@ -97,9 +98,6 @@ def main():
         batch_size=30,
         num_workers=10,
     )
-
-    annotation_file="../../annotations_trainval2017/annotations/instances_val2017.json"
-    
 
     patch = attack_methods.generate_random_patch()
     patch = patch.to(f'cuda:{local_rank}')
